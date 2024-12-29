@@ -128,36 +128,37 @@ install_requests() {
 install_node() {
     show "Установка ноды GaiaNet..."
     if curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash; then
-       source /root/.bashrc
-    show "Инициализация ноды GaiaNet..."
-    if gaianet init; then
-        show_bold "Инициализация GaiaNet завершена."
-    else
-        show_war "Ошибка при инициализации GaiaNet."
-        return 1
-    fi
-    else
-       show_war "Ошибка при установке. Проверьте соединение или ссылку."
-       return 1
-fi
+        source /root/.bashrc
 
+        show "Инициализация ноды GaiaNet..."
+        if gaianet init; then
+            show_bold "Инициализация GaiaNet завершена."
+        else
+            show_war "Ошибка при инициализации GaiaNet."
+            return 1
+        fi
 
-    # Запуск GaiaNet
-    show "Запуск ноды GaiaNet..."
-    if gaianet start; then
-        show_bold "Нода GaiaNet успешно запущена."
+        # Запуск GaiaNet
+        show "Запуск ноды GaiaNet..."
+        if gaianet start; then
+            show_bold "Нода GaiaNet успешно запущена."
+        else
+            show_war "Ошибка при запуске GaiaNet."
+            return 1
+        fi
+
+        # Запуск скрипта автоматического общения
+        if confirm "Запустить скрипт автоматического общения с нодой?"; then
+            install_requests
+        else
+            show_war "Отмена. Скрипт не запущен."
+        fi
     else
-        show_war "Ошибка при запуске GaiaNet."
+        show_war "Ошибка при установке. Проверьте соединение или ссылку."
         return 1
-    fi
-    
-    # Запуск скрипта
-    if confirm "Запустить скрипт автоматического общения с нодой?"; then
-        install_requests
-    else
-        show_war "Отмена. Скрипт не запущен."
     fi
 }
+
 
 # Удаление ноды
 delete() {
