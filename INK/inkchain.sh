@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Логотип команды
-#show_logotip() {
-#    bash <(curl -s https://raw.githubusercontent.com/tpatop/nodateka/refs/heads/main/basic/name.sh)
-#}
 # Цвета для текста
 TERRACOTTA='\033[38;5;208m'
 LIGHT_BLUE='\033[38;5;117m'
@@ -33,14 +29,12 @@ function show_purple() {
     echo -e "${PURPLE}$1${NC}"
 }
 
-# Вывод названия узла
-show_name() {
-#    echo ""
-#    echo -e "\033[1;35mINK chain 11111111111node\033[0m"
-#    echo ""
-#}
+# Логотип команды
+show_logotip() {
+    bash <(curl -s https://raw.githubusercontent.com/NodatekaII/Basic/refs/heads/main/name.sh)
+}
 
-# ASCII-арт
+# Название узла
 echo ""
 show_purple '░░░░░▀█▀░█▄░░█░█░▄▀░░░█▀▀█░█░░█░█▀▀█░▀█▀░█▄░░█░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░'
 show_purple '░░░░░░█░░█░█░█░█▀▄░░░░█░░░░█▀▀█░█▄▄█░░█░░█░█░█░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░'
