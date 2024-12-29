@@ -127,12 +127,8 @@ install_requests() {
 # Функция установки ноды
 install_node() {
     show "Установка ноды GaiaNet..."
-    if curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash;
-    else
-        show_war "Ошибка при установке. Проверьте соединение или ссылку."
-        return 1
-    fi
-    source /root/.bashrc
+    if curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash; then
+       source /root/.bashrc
     show "Инициализация ноды GaiaNet..."
     if gaianet init; then
         show_bold "Инициализация GaiaNet завершена."
@@ -140,6 +136,11 @@ install_node() {
         show_war "Ошибка при инициализации GaiaNet."
         return 1
     fi
+    else
+       show_war "Ошибка при установке. Проверьте соединение или ссылку."
+       return 1
+fi
+
 
     # Запуск GaiaNet
     show "Запуск ноды GaiaNet..."
