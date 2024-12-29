@@ -211,6 +211,7 @@ install_node() {
     show_bold "Установка и запуск выполнены успешно!"
     echo ""  # Пустая строка для разделения между контейнерами
     echo -en "${TERRACOTTA}${BOLD}Проверь статус по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+    echo -en "${TERRACOTTA}${BOLD}Login: ${NC}${LIGHT_BLUE}admin  ${NC} ${TERRACOTTA}${BOLD}Password: ${NC}${LIGHT_BLUE}ink${NC}\n"
     echo ""  # Пустая строка для разделения между контейнерами
 }
 
@@ -232,6 +233,7 @@ update_mainnet() {
     show_bold "Узел успешно обновлён до mainnet!"
     echo ""  # Пустая строка для разделения между контейнерами
     echo -en "${TERRACOTTA}${BOLD}Проверь статус ноды по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+    echo -en "${TERRACOTTA}${BOLD}Login: ${NC}${LIGHT_BLUE}admin  ${NC} ${TERRACOTTA}${BOLD}Password: ${NC}${LIGHT_BLUE}ink${NC}\n"
     echo ""  # Пустая строка для разделения между контейнерами
 }
 
