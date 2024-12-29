@@ -34,12 +34,14 @@ show_logotip() {
     bash <(curl -s https://raw.githubusercontent.com/NodatekaII/Basic/refs/heads/main/name.sh)
 }
 
-# Название узла
-echo ""
-show_purple '░░░░░▀█▀░█▄░░█░█░▄▀░░░█▀▀█░█░░█░█▀▀█░▀█▀░█▄░░█░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░'
-show_purple '░░░░░░█░░█░█░█░█▀▄░░░░█░░░░█▀▀█░█▄▄█░░█░░█░█░█░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░'
-show_purple '░░░░░▄█▄░█░░▀█░█░░█░░░█▄▄█░█░░█░█░░█░▄█▄░█░░▀█░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░'
-echo ""
+#финальное сообщение
+final_message() {
+    echo ''
+    show_bold "Присоединяйся к Нодатеке, будем ставить ноды вместе!"
+    echo ''
+    echo -en "${TERRACOTTA}${BOLD}Telegram: ${NC}${LIGHT_BLUE}https://t.me/cryptotesemnikov/778${NC}\n"
+    echo -en "${TERRACOTTA}${BOLD}Twitter: ${NC}${LIGHT_BLUE}https://x.com/nodateka${NC}\n"
+    echo -e "${TERRACOTTA}${BOLD}YouTube: ${NC}${LIGHT_BLUE}https://www.youtube.com/@CryptoTesemnikov${NC}\n"
 }
 
 # Функция для подтверждения действия
@@ -61,7 +63,52 @@ confirm() {
     esac
 }
 
+
+# Название узла
+echo ""
+show_purple '░░░░░▀█▀░█▄░░█░█░▄▀░░░█▀▀█░█░░█░█▀▀█░▀█▀░█▄░░█░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░'
+show_purple '░░░░░░█░░█░█░█░█▀▄░░░░█░░░░█▀▀█░█▄▄█░░█░░█░█░█░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░'
+show_purple '░░░░░▄█▄░█░░▀█░█░░█░░░█▄▄█░█░░█░█░░█░▄█▄░█░░▀█░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░'
+show_blue '     script version: v0.2 MINNNET'
+echo ""
+}
+
+# Меню с командами
+show_menu() {
+    clear
+    show_logotip
+    show_name
+    show_bold 'Выберите действие:'
+    echo ''
+    actions=(
+        "1. Установить ноду mainnet"
+        "2. Обновить узел до mainnet"
+        "3. Просмотр логов ноды"
+        "4. Проверка контейнеров"
+        "5. Вывод секретных ключей"
+        "9. Удаление ноды"
+        "0. Выход"
+    )
+    for action in "${actions[@]}"; do
+        show "$action"
+    done
+}
+
+# Проверка на запуск от имени root
+if [ "$EUID" -ne 0 ]; then
+  show_war "Пожалуйста, запустите скрипт с правами root."
+  exit 1
+fi
+
+
+#Задаем переменные
 ink_dir="$HOME/ink/node"
+
+IP=$(curl -4 -s ifconfig.me)
+if [ -z "$IP" ]; then
+  show_war "Не удалось получить внешний IP адрес."
+  exit 1
+fi
 
 # Функция для установки зависимостей
 install_dependencies() {
@@ -73,7 +120,7 @@ install_dependencies() {
         show_war 'Отменено.'
     fi
 }
-
+#Клонируем ррепозиторий
 clone_rep() {
     show 'Клонирование репозитория Ink node..'
     if [ -d "$ink_dir" ]; then
@@ -85,7 +132,7 @@ clone_rep() {
         }
     fi
 }
-
+#Создаем файл
 create_env_file() {
     show "Добавление переменных в .env..."
     cat > "$ink_dir/.env" <<EOL
@@ -146,7 +193,7 @@ install_node() {
 
     show "Переход в директорию узла..."
     cd "$ink_dir" || {
-        show_war "Ошибка: директория node не найдена!"
+        show_war "Ошибка: директория не найдена!"
     }
    
    create_env_file
@@ -161,9 +208,11 @@ install_node() {
         }
     }
     show_bold "Установка и запуск выполнены успешно!"
-    show_bold "Проверь статус по ссылке: http://$(hostname -I | awk '{print $1}'):3301/"
-    echo ''
+    echo ""  # Пустая строка для разделения между контейнерами
+    echo -en "${TERRACOTTA}${BOLD}Проверь статус по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+    echo ""  # Пустая строка для разделения между контейнерами
 }
+
 
 # Обновление узла до mainnet
 update_mainnet() {
@@ -180,87 +229,61 @@ update_mainnet() {
         exit 1
     }
     show_bold "Узел успешно обновлён до mainnet!"
-    echo ''
+    echo ""  # Пустая строка для разделения между контейнерами
+    echo -en "${TERRACOTTA}${BOLD}Проверь статус ноды по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+    echo ""  # Пустая строка для разделения между контейнерами
 }
 
 get_private_key() {
     echo ''
-    echo '/shared/jwt.txt: '
+    show_bold "JWT-token: "
     docker exec -it node-op-geth-1 cat /shared/jwt.txt
-    echo 'nodekey: '
+    show_bold "Secret key: "
     docker exec -it node-op-geth-1 cat geth/geth/nodekey
     echo ''
 }
 
 # Удаление ноды
 delete() {
-    show "Остановка и удаление контейнеров"
-    cd "$ink_dir" && docker compose down
-    show_bold 'Удалить директорию и все данные?'
-    if confirm ''; then
-        cd ~ && rm -rf ~/ink
-        show_bold "Успешно удалено." 
-    else
-        show_war "Не удалено."
+    if [ -d "$ink_dir" ] && docker ps | grep -q "node-op-geth-1"; then
+        show_war "Нода активна! Остановите её перед удалением."
+        return 1
     fi
-}
-
-# Меню с командами
-show_menu() {
-   # show_logotip
-    show_name
-    show_blue 'Mainnet'
-    show_bold 'Выберите действие:'
-    echo ''
-    actions=(
-        "1. Установить ноду"
-        "2. Просмотр логов ноды"
-        "3. Запрос к ноде"
-        "4. Проверка контейнеров"
-        "7. Вывод приватного ключа"
-        "8. Обновить узел до mainnet"
-        "9. Удаление ноды"
-        "0. Выход"
-    )
-    for action in "${actions[@]}"; do
-        show "$action"
-    done
+    
+    show "Остановка и удаление контейнеров"
+    
+    # Останавливаем контейнеры и проверяем существование директории
+    if [ -d "$ink_dir" ]; then
+        cd "$ink_dir" && docker compose down
+    else
+        show_war "Директория $ink_dir не найдена. Контейнеры не остановлены."
+    fi
+    # Подтверждение удаления данных
+    if confirm "Удалить директорию и все данные?"; then
+        if [ -d ~/ink ]; then
+            cd ~ && rm -rf ~/ink
+            show_bold "Успешно удалено."
+        else
+            show_war "Директория ~/ink не найдена."
+        fi
+    else
+        show_war "Отмена. Не удалено."
+    fi
 }
 
 menu() {
     case $1 in
-        1)  
-            install_dependencies
-            install_node ;;
-        2)  cd "$ink_dir" && docker compose logs -f --tail 20 ;;
-        3)  
-            : "${INK_RPC_PORT:=9393}"
-            if ! command -v jq &>/dev/null; then
-                show_war 'Ошибка: jq не установлен. Установите его с помощью: sudo apt install jq'
-                exit 0
-            fi
-            if curl -s http://localhost:"$INK_RPC_PORT" &>/dev/null; then
-                curl -s -d '{"id":1,"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["latest",false]}' \
-                     -H "Content-Type: application/json" \
-                     http://localhost:"$INK_RPC_PORT" | jq
-            else
-                show_war 'Ошибка: RPC на порту $INK_RPC_PORT недоступен. Проверьте, запущен ли узел.'
-            fi ;;
-        4)  
-            if [ -d "$ink_dir" ]; then
-                cd "$ink_dir" && docker compose ps -a
-            else
-                show_war 'Ошибка: директория $ink_dir не найдена.'
-            fi ;;
-        7)  get_private_key ;;
-        8)  update_mainnet ;;
+        1)  install_dependencies; install_node ;;
+        2)  update_mainnet ;;
+        3)  cd "$ink_dir" && docker compose logs -f --tail 20 ;;
+        4)  [ -d "$ink_dir" ] && cd "$ink_dir" && docker compose ps -a || show_war "Директория $ink_dir не найдена." ;;
+        5)  get_private_key ;;
         9)  delete ;;
-        0)  
-            echo -en "${TERRACOTTA}${BOLD}Присоединяйся к Нодатеке, будем ставить ноды вместе! ${NC}${LIGHT_BLUE}https://t.me/cryptotesemnikov/778${NC}\n"
-            exit 0 ;;
+        0)  final_message; exit 0 ;;
         *)  show_war "Неверный выбор, попробуйте снова." ;;
     esac
 }
+            
 
 while true; do
     show_menu
