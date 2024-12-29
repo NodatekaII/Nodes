@@ -67,7 +67,7 @@ ink_dir="$HOME/ink/node"
 install_dependencies() {
     show_bold 'Установить необходимые пакеты и зависимости?'
     if confirm ''; then
-        bash <(curl -s https://raw.githubusercontent.com/tpatop/nodateka/refs/heads/main/basic/admin/docker.sh)
+        bash <(curl -s https://raw.githubusercontent.com/NodatekaII/Basic/refs/heads/main/docker.sh)
         sudo apt install jq net-tools
     else
         show_war 'Отменено.'
@@ -161,7 +161,7 @@ install_node() {
         }
     }
     show_bold "Установка и запуск выполнены успешно!"
-    show_blue "Проверь статус по ссылке: http://your_server_ip_address:3301/ - admin ink"
+    show_bold "Проверь статус по ссылке: http://$(hostname -I | awk '{print $1}'):3301/"
     echo ''
 }
 
