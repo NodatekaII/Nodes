@@ -1,76 +1,70 @@
 #!/bin/bash
 
-# Название файла для Python скрипта
-PYTHON_SCRIPT_NAME="gaia_request.py"
-VENV_DIR="venv"
+# Цвета для текста
+TERRACOTTA='\033[38;5;208m'
+LIGHT_BLUE='\033[38;5;117m'
+RED='\033[0;31m'
+BOLD='\033[1m'
+NC='\033[0m'
 
-# Проверка, запущен ли скрипт с правами суперпользователя
+# Функции для форматирования текста
+function show() {
+    echo -e "${TERRACOTTA}$1${NC}"
+}
+
+function show_bold() {
+    echo -en "${TERRACOTTA}${BOLD}$1${NC}"
+}
+
+function show_war() {
+    echo -e "${RED}${BOLD}$1${NC}"
+}
+
+# Проверка прав суперпользователя
 if [ "$EUID" -ne 0 ]; then
-    echo "Пожалуйста, запустите скрипт с правами суперпользователя (sudo)."
+    show_war "Пожалуйста, запустите скрипт с правами суперпользователя (sudo)."
     exit 1
 fi
 
-# Проверка, установлен ли Python, и установка, если он не установлен
-if ! command -v python3 &> /dev/null
-then
-    echo "Python3 не найден, устанавливаем..."
+# Название сессии screen
+SCREEN_SESSION_NAME="gaia_request"
+
+# Проверка наличия Python
+if ! command -v python3 &> /dev/null; then
+    show "Python3 не найден. Устанавливаем..."
     apt update
     apt install python3 -y
 else
-    echo "Python3 уже установлен"
+    show "Python3 уже установлен."
 fi
 
-# Установка python3-venv, если не установлен
-if ! dpkg -s python3-venv &> /dev/null; then
-    echo "Устанавливаем python3-venv..."
-    apt install python3-venv -y
-else
-    echo "python3-venv уже установлен"
+# Установка зависимостей
+show "Проверка и установка необходимых зависимостей..."
+apt install python3-venv python3-pip jq screen -y
+
+# Получение NODEID из config.json
+if [ ! -f ~/gaianet/config.json ]; then
+    show_war "Файл ~/gaianet/config.json не найден. Проверьте установку ноды."
+    exit 1
 fi
 
-# Проверка, установлен ли pip, и установка, если он не установлен
-if ! command -v pip3 &> /dev/null
-then
-    echo "pip3 не найден, устанавливаем..."
-    apt update
-    apt install python3-pip -y
-else
-    echo "pip3 уже установлен"
-fi
-
-# Установка virtualenv, если не установлен
-if ! pip3 show virtualenv &> /dev/null; then
-    echo "Устанавливаем virtualenv..."
-    pip3 install virtualenv
-else
-    echo "virtualenv уже установлен"
-fi
+NODEID=$(jq -r '.address' ~/gaianet/config.json)
+URL_CHAT="http://$NODEID.us.gaianet.network/v1/chat/completions"
 
 # Создание виртуального окружения
+VENV_DIR="venv"
 if [ ! -d "$VENV_DIR" ]; then
     python3 -m venv $VENV_DIR
 fi
-
-# Активация виртуального окружения
 source $VENV_DIR/bin/activate
 
-# Установка библиотек requests и faker, если они не установлены
-if ! pip3 show requests &> /dev/null; then
-    echo "Библиотека requests не найдена, устанавливаем..."
-    pip3 install requests
-else
-    echo "Библиотека requests уже установлена"
-fi
+# Установка необходимых библиотек
+pip3 install --upgrade pip
+pip3 install requests faker
 
-if ! pip3 show faker &> /dev/null; then
-    echo "Библиотека Faker не найдена, устанавливаем..."
-    pip3 install faker
-else
-    echo "Библиотека Faker уже установлена"
-fi
-
-# Создание Python скрипта
-echo "Создаем Python скрипт..."
+# Создание Python-скрипта
+PYTHON_SCRIPT_NAME="gaia_request.py"
+show "Создание Python-скрипта..."
 cat << EOF > $PYTHON_SCRIPT_NAME
 import requests
 import time
@@ -78,25 +72,23 @@ import random
 import logging
 from faker import Faker
 
-# Настройка логирования для вывода в консоль
+# Настройка логирования
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
-# URL и заголовки для запроса
-url = input("Введите URL для отправки запроса: ")
+# URL и заголовки для запросов
+url = "$URL_CHAT"
 headers = {
     'accept': 'application/json',
     'Content-Type': 'application/json'
 }
 
-# Инициализация Faker для генерации случайных вопросов
+# Инициализация Faker
 faker = Faker()
 
-# Функция для отправки запроса
+# Функция отправки запроса
 def send_request():
     try:
-        # Генерация случайного вопроса с использованием Faker
         question = faker.sentence(nb_words=10)
-        # Формирование тела запроса
         data = {
             "messages": [
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -108,50 +100,34 @@ def send_request():
         if response.status_code == 200:
             logging.info(f"Ответ: {response.json()}")
         else:
-            logging.error(f"Ошибка получения ответа, статус-код: {response.status_code}")
+            logging.error(f"Ошибка: статус-код {response.status_code}")
     except Exception as e:
-        logging.error(f"Произошла ошибка при отправке запроса: {str(e)}")
+        logging.error(f"Ошибка при запросе: {str(e)}")
 
 # Основной цикл
 def main():
-    sleep_hours = 8  # Часы для сна
-    sleep_seconds = sleep_hours * 3600  # Перевод в секунды
-
     while True:
-        # Определяем случайное количество запросов перед длинным перерывом
-        num_requests = random.randint(6, 12)  # От 6 до 12 запросов (в среднем около часа)
-
-        for _ in range(num_requests):
+        for _ in range(random.randint(6, 12)):
             send_request()
-            # Случайная задержка между запросами от 1 до 5 минут
-            delay = random.randint(60, 300)
-            logging.info(f"Ожидание {delay // 60} минут...")
-            time.sleep(delay)
-
-        # Длинный перерыв от 30 минут до 1 часа
-        long_break = random.randint(1800, 3600)
-        logging.info(f"Перерыв на {long_break // 60} минут...")
-        time.sleep(long_break)
-
-        # Перерыв на сон каждые 24 часа
-        logging.info(f"Сон на {sleep_hours} часов...")
-        time.sleep(sleep_seconds)
+            time.sleep(random.randint(60, 300))
+        logging.info("Перерыв на 30-60 минут...")
+        time.sleep(random.randint(1800, 3600))
 
 if __name__ == "__main__":
     main()
 EOF
 
-# Проверка, установлен ли screen
-if ! command -v screen &> /dev/null
-then
-    echo "screen не найден, устанавливаем..."
-    apt install screen -y
-else
-    echo "screen уже установлен"
+# Проверка существующей screen-сессии
+if screen -list | grep -q "$SCREEN_SESSION_NAME"; then
+    show_war "Сессия '$SCREEN_SESSION_NAME' уже запущена."
+    show_bold "Подключитесь с помощью команды: screen -r $SCREEN_SESSION_NAME"
+    exit 1
 fi
 
-# Запуск Python скрипта в фоновом режиме через screen
-screen -dmS gaia_request bash -c "source $VENV_DIR/bin/activate && python3 $PYTHON_SCRIPT_NAME | tee -a request_script.log"
+# Запуск скрипта в screen
+show "Запуск Python-скрипта в screen-сессии..."
+screen -dmS "$SCREEN_SESSION_NAME" bash -c "source $VENV_DIR/bin/activate && python3 $PYTHON_SCRIPT_NAME"
 
-echo "Скрипт $PYTHON_SCRIPT_NAME запущен в фоновом режиме через screen."
-echo "Чтобы подключиться к сессии screen и посмотреть логи, используйте команду: screen -r gaia_request"
+# Уведомление пользователя
+show_bold "Скрипт $PYTHON_SCRIPT_NAME запущен в screen-сессии '$SCREEN_SESSION_NAME'."
+show_bold "Для подключения используйте: screen -r $SCREEN_SESSION_NAME"
