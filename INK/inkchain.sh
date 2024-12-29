@@ -76,7 +76,6 @@ echo ""
 
 # Меню с командами
 show_menu() {
-    clear
     show_logotip
     show_name
     show_bold 'Выберите действие:'
@@ -103,6 +102,7 @@ fi
 
 
 #Задаем переменные
+clear
 ink_dir="$HOME/ink/node"
 
 IP=$(curl -4 -s ifconfig.me)
