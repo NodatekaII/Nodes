@@ -5,8 +5,10 @@ TERRACOTTA='\033[38;5;208m'
 LIGHT_BLUE='\033[38;5;117m'
 RED='\033[0;31m'
 BOLD='\033[1m'
-NC='\033[0m'
 PURPLE='\033[0;35m'
+VIOLET='\033[38;5;93m'
+NC='\033[0m'
+
 
 # Функции для форматирования текста
 function show() {
@@ -27,6 +29,10 @@ function show_war() {
 
 function show_purple() {
     echo -e "${PURPLE}$1${NC}"
+}
+
+function show_violet() {
+    echo -e "${VIOLET}$1${NC}"
 }
 
 # Логотип команды
@@ -67,9 +73,9 @@ confirm() {
 # Название узла
 show_name() {
    echo ""
-   show_purple '░░░░░▀█▀░█▄░░█░█░▄▀░░░█▀▀█░█░░█░█▀▀█░▀█▀░█▄░░█░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░'
-   show_purple '░░░░░░█░░█░█░█░█▀▄░░░░█░░░░█▀▀█░█▄▄█░░█░░█░█░█░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░'
-   show_purple '░░░░░▄█▄░█░░▀█░█░░█░░░█▄▄█░█░░█░█░░█░▄█▄░█░░▀█░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░'
+   show_violet '░░░░░▀█▀░█▄░░█░█░▄▀░░░█▀▀█░█░░█░█▀▀█░▀█▀░█▄░░█░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░'
+   show_violet '░░░░░░█░░█░█░█░█▀▄░░░░█░░░░█▀▀█░█▄▄█░░█░░█░█░█░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░'
+   show_violet '░░░░░▄█▄░█░░▀█░█░░█░░░█▄▄█░█░░█░█░░█░▄█▄░█░░▀█░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░'
    show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
@@ -86,6 +92,7 @@ show_menu() {
         "3. Просмотр логов ноды"
         "4. Проверка контейнеров"
         "5. Вывод секретных ключей"
+        "6. Показать ссылку на Grafana"
         "9. Удаление ноды"
         "0. Выход"
     )
@@ -281,6 +288,11 @@ menu() {
         3)  cd "$ink_dir" && docker compose logs -f --tail 20 ;;
         4)  [ -d "$ink_dir" ] && cd "$ink_dir" && docker compose ps -a || show_war "Директория $ink_dir не найдена." ;;
         5)  get_private_key ;;
+        6)  
+            echo ""  
+            echo -en "${TERRACOTTA}${BOLD}Проверь статус ноды по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+            echo -en "${TERRACOTTA}${BOLD}Login: ${NC}${LIGHT_BLUE}admin  ${NC} ${TERRACOTTA}${BOLD}Password: ${NC}${LIGHT_BLUE}ink${NC}\n"
+            echo "" ;;
         9)  delete ;;
         0)  final_message; exit 0 ;;
         *)  show_war "Неверный выбор, попробуйте снова." ;;
