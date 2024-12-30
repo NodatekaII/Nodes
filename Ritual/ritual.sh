@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -351,15 +351,21 @@ call_contract() {
     cd /root/infernet-container-starter || exit
 
     # Развёртываем контракт и извлекаем адрес
-    DEPLOY_OUTPUT=$(project=hello-world make deploy-contracts)
+    DEPLOY_OUTPUT=$(project=hello-world make deploy-contracts 2>&1 | tee deploy.log)
+    echo "DEPLOY_OUTPUT содержимое:"
+    echo "$DEPLOY_OUTPUT"
+
+    # Извлечение адреса контракта
     CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Contract Address: )0x[a-fA-F0-9]{40}')
 
     if [[ -z "$CONTRACT_ADDRESS" ]]; then
-        show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
-        return 1
+        echo "❌ Ошибка: Не удалось извлечь адрес контракта."
+    else
+        echo "✅ Адрес контракта: $CONTRACT_ADDRESS"
     fi
 
-    show "Адрес контракта: $CONTRACT_ADDRESS"
+
+    
 
     # Файл для замены
     local contract_file="/root/infernet-container-starter/projects/hello-world/contracts/script/CallContract.s.sol"
