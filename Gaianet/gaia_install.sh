@@ -154,8 +154,8 @@ install_node() {
             echo ''
         else
             show "Замена Node ID..."
-            sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~gaianet/config.json
-            sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~gaianet/nodeid.json    
+            sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~/gaianet/config.json
+            sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~/gaianet/nodeid.json    
         fi
         # Запуск GaiaNet
         show "Запуск ноды GaiaNet..."
