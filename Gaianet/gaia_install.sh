@@ -239,7 +239,6 @@ delete() {
     else
         show_war "Отмена. Данные не удалены."
     fi
-    echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
 }
 
 
