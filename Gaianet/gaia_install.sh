@@ -229,7 +229,50 @@ delete() {
             else
                 show_war "Сессия 'gaia_request' не найдена."
             fi
-            
+            # Остановка процесса Qdrant
+            echo "Остановка процесса Qdrant..."
+            qdrant_pid=$(ps aux | grep '/root/gaianet/bin/qdrant' | grep -v 'grep' | awk '{print $2}')
+            if [[ -n "$qdrant_pid" ]]; then
+                echo "Процесс Qdrant найден с PID: $qdrant_pid. Завершаем..."
+                kill -9 "$qdrant_pid"
+                echo "Процесс Qdrant остановлен."
+            else
+                echo "Процесс Qdrant не найден. Возможно, он уже остановлен."
+            fi
+            # Удаление бинарного файла Qdrant
+            echo "Удаление бинарного файла Qdrant..."
+            if [[ -f "/root/gaianet/bin/qdrant" ]]; then
+                rm -f /root/gaianet/bin/qdrant
+                echo "Бинарный файл Qdrant удалён."
+            else
+                echo "Бинарный файл Qdrant не найден."
+            fi
+            # Удаление данных Qdrant
+            echo "Удаление данных Qdrant..."
+            if [[ -d "/var/lib/qdrant" ]]; then
+                rm -rf /var/lib/qdrant
+                echo "Данные Qdrant удалены."
+            else
+                echo "Данные Qdrant не найдены."
+            fi
+            # Удаление конфигурационных файлов
+            echo "Удаление конфигурационных файлов Qdrant..."
+            if [[ -d "/etc/qdrant" ]]; then
+                rm -rf /etc/qdrant
+                echo "Конфигурационные файлы Qdrant удалены."
+            else
+                echo "Конфигурационные файлы Qdrant не найдены."
+            fi
+            # Удаление логов
+            echo "Удаление логов Qdrant..."
+            if [[ -d "/var/log/qdrant" ]]; then
+                rm -rf /var/log/qdrant
+                echo "Логи Qdrant удалены."
+            else
+                echo "Логи Qdrant не найдены."
+            fi
+            echo "Операция по остановке и удалению Qdrant завершена."
+
             # Удаление директории
             rm -rf ~/gaianet
             show "Директория ~/gaianet и все данные успешно удалены."
