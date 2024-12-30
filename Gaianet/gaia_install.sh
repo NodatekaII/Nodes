@@ -59,7 +59,7 @@ final_message() {
 # Функция для подтверждения действия
 confirm() {
     local prompt="$1"
-    echo -en "$prompt [y/n, Enter = yes]: "  # Выводим вопрос с цветом
+    show_bold "$prompt [y/n, Enter = yes]: "  # Выводим вопрос с цветом
     read choice  # Читаем ввод пользователя
     case "$choice" in
         ""|y|Y|yes|Yes)  # Пустой ввод или "да"
