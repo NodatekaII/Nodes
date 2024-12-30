@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -148,7 +148,7 @@ set_var() {
     DEPLOY_SCRIPT_PATH="/root/infernet-container-starter/projects/hello-world/contracts/script/Deploy.s.sol"
     MAKEFILE_PATH="/root/infernet-container-starter/projects/hello-world/contracts/Makefile"
     DOCKER_COMPOSE_PATH="/root/infernet-container-starter/deploy/docker-compose.yaml"
-    $DOCKER_IMAGE_VERSION="1.4.0"
+    DOCKER_IMAGE_VERSION="1.4.0"
     #PORTS=("4000" "6379" "24224" "8545" "3000")
     #foundryup="/root/.foundry/bin/foundryup"
     #FORGE_PATH="/root/.foundry/bin/forge"
