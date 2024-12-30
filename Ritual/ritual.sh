@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -353,50 +353,55 @@ install_project_dependencies() {
 
 # Функция для автоматической вставки адреса контракта
 call_contract() {
-    show "Развертывание контракта..."
-    cd /root/infernet-container-starter || { show_war "❌ Каталог проекта не найден."; return 1; }
+    if confirm "Развернуть контракт?"; then
+        show "Развертывание контракта..."
+        cd /root/infernet-container-starter || { show_war "❌ Каталог проекта не найден."; return 1; }
 
-    # Развёртываем контракт и извлекаем адрес
-    DEPLOY_OUTPUT=$(project=hello-world make deploy-contracts 2>&1 | tee deploy.log)
-    echo "===== DEPLOY_OUTPUT ====="
-    echo "$DEPLOY_OUTPUT"
-    echo "========================="
+        # Развёртываем контракт и извлекаем адрес
+        DEPLOY_OUTPUT=$(project=hello-world make deploy-contracts 2>&1 | tee deploy.log)
+        echo "===== DEPLOY_OUTPUT ====="
+        echo "$DEPLOY_OUTPUT"
+        echo "========================="
 
-    # Извлечение адреса контракта
-    CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | awk '/Deployed SaysHello:/ {print $3}')
-    if [[ -z "$CONTRACT_ADDRESS" ]]; then
-        show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
-        return 1
+        # Извлечение адреса контракта
+        CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | awk '/Deployed SaysHello:/ {print $3}')
+        if [[ -z "$CONTRACT_ADDRESS" ]]; then
+            show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
+            return 1
+        else
+            show "✅ Адрес контракта: $CONTRACT_ADDRESS"
+        fi
+
+        # Файл для замены
+        local contract_file="/root/infernet-container-starter/projects/hello-world/contracts/script/CallContract.s.sol"
+        if [[ ! -f "$contract_file" ]]; then
+            show_war "❌ Файл $contract_file не найден."
+            return 1
+        fi
+
+        # Заменяем адрес контракта в файле
+        show "Запись адреса контракта в файл $contract_file..."
+        if sed -i "s|SaysGM(.*)|SaysGM($CONTRACT_ADDRESS)|" "$contract_file"; then
+            show_bold "✅ Адрес контракта успешно записан."
+            echo ''
+        else
+            show_war "❌ Ошибка при записи адреса контракта."
+            return 1
+        fi
+
+        # Вызов контракта
+        show "Вызов контракта..."
+        if ! project=hello-world make call-contract 2>&1 | tee call_contract.log; then
+            show_war "❌ Ошибка при вызове контракта. Смотрите 'call_contract.log' для деталей."
+            return 1
+        fi
+
+        show_bold "✅ Контракт успешно вызван."
+        echo ""
     else
-        show "✅ Адрес контракта: $CONTRACT_ADDRESS"
-    fi
-
-    # Файл для замены
-    local contract_file="/root/infernet-container-starter/projects/hello-world/contracts/script/CallContract.s.sol"
-    if [[ ! -f "$contract_file" ]]; then
-        show_war "❌ Файл $contract_file не найден."
-        return 1
-    fi
-
-    # Заменяем адрес контракта в файле
-    show "Запись адреса контракта в файл $contract_file..."
-    if sed -i "s|SaysGM(.*)|SaysGM($CONTRACT_ADDRESS)|" "$contract_file"; then
-        show_bold "✅ Адрес контракта успешно записан."
+        show_bold"⚠️ Отмена развертывания контракта."
         echo ''
-    else
-        show_war "❌ Ошибка при записи адреса контракта."
-        return 1
     fi
-
-    # Вызов контракта
-    show "Вызов контракта..."
-    if ! project=hello-world make call-contract 2>&1 | tee call_contract.log; then
-        show_war "❌ Ошибка при вызове контракта. Смотрите 'call_contract.log' для деталей."
-        return 1
-    fi
-
-    show_bold "✅ Контракт успешно вызван."
-    echo ""
 }
 
 
