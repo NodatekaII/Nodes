@@ -116,11 +116,10 @@ install_dependencies() {
 
 # Установка скрипта requests
 install_requests() {
-    cd ~/gaianet || { show_war "Ошибка: директория ~/gaianet не найдена."; return 1; }
+    #cd ~/gaianet || { show_war "Ошибка: директория ~/gaianet не найдена."; return 1; }
     wget https://raw.githubusercontent.com/NodatekaII/Nodes/refs/heads/main/Gaianet/requests.sh
     chmod +x requests.sh
-    ./requests.sh --install
-    
+    ./requests.sh --install  
 }
 
 
