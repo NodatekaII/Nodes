@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -141,6 +141,7 @@ install_dependencies() {
 }
 
 set_var() {
+    
     # Переменные для путей
     CONFIG_PATH="/root/infernet-container-starter/deploy/config.json"
     HELLO_CONFIG_PATH="/root/infernet-container-starter/projects/hello-world/container/config.json"
@@ -151,6 +152,10 @@ set_var() {
     #foundryup="/root/.foundry/bin/foundryup"
     #FORGE_PATH="/root/.foundry/bin/forge"
     export PATH=$PATH:/root/.foundry/bin
+    echo "DEBUG: HELLO_CONFIG_PATH = $HELLO_CONFIG_PATH"
+    echo "DEBUG: CONFIG_PATH = $CONFIG_PATH"
+    echo "DEBUG: DOCKER_COMPOSE_PATH = $DOCKER_COMPOSE_PATH"
+
 }
 
 # Проверка, занят ли порт
