@@ -352,7 +352,7 @@ call_contract() {
 
     # Развёртываем контракт и извлекаем адрес
     DEPLOY_OUTPUT=$(project=hello-world make deploy-contracts)
-    CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Contract deployed at: )0x[a-fA-F0-9]{40}')
+    CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Contract Address: )0x[a-fA-F0-9]{40}')
 
     if [[ -z "$CONTRACT_ADDRESS" ]]; then
         show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
