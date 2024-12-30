@@ -129,5 +129,8 @@ show "Запуск Python-скрипта в screen-сессии..."
 screen -dmS "$SCREEN_SESSION_NAME" bash -c "source $VENV_DIR/bin/activate && python3 $PYTHON_SCRIPT_NAME"
 
 # Уведомление пользователя
-show_bold "Скрипт $PYTHON_SCRIPT_NAME запущен в screen-сессии '$SCREEN_SESSION_NAME'."
-show_bold "Для подключения используйте: screen -r $SCREEN_SESSION_NAME"
+show_bold "Скрипт $PYTHON_SCRIPT_NAME запущен в screen-сессии."
+echo ''
+show_bold "Для подключения используйте: " 
+show "screen -r $SCREEN_SESSION_NAME"
+echo ''
