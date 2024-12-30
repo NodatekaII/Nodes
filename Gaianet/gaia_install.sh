@@ -191,6 +191,7 @@ install_node() {
             sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~/gaianet/config.json
             sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~/gaianet/nodeid.json    
         fi
+        check_port
         # Запуск GaiaNet
         show "Запуск ноды GaiaNet..."
         if gaianet start; then
