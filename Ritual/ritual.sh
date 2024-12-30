@@ -458,11 +458,11 @@ delete_node() {
         cd ~
         show "Остановка и удаление контейнеров..."
         docker compose -f $DOCKER_COMPOSE_PATH down
-        docker rm -rf infernet-node
-        docker rm -rf hello-world
-        docker rm -rf infernet-fluentbit
-        docker rm -rf infernet-anvil
-        docker rm -rf infernet-redis
+        docker rm infernet-node
+        docker rm hello-world
+        docker rm infernet-fluentbit
+        docker rm infernet-anvil
+        docker rm infernet-redis
 
         # Завершение screen сессии
         if screen -list | grep -q "ritual"; then
