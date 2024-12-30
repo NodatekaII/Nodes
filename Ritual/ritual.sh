@@ -466,7 +466,6 @@ menu() {
             start_screen_session
             install_foundry
             install_project_dependencies
-            deploy_contract
             call_contract
             ;;
         2)  
@@ -494,7 +493,7 @@ menu() {
             ;;
         9)  
             # Удаление ноды с подтверждением
-                delete
+            delete_node
             ;;
         0)  
             # Выход с финальным сообщением
