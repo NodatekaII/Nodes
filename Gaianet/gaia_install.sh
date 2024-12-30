@@ -142,7 +142,7 @@ is_port_in_use() {
 
 # Проверка порта
 check_port() {
-    CONFIG_FILE="~/gaianet/config.json"
+    CONFIG_FILE="$HOME/gaianet/config.json"
     PORT_KEY="llamaedge_port"
     # Найти текущий порт в файле конфигурации
     current_port=$(grep -Po '"'"$PORT_KEY"'":\s*"\K[0-9]+' $CONFIG_FILE)
