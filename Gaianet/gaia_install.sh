@@ -7,6 +7,7 @@ RED='\033[0;31m'
 BOLD='\033[1m'
 PURPLE='\033[0;35m'
 VIOLET='\033[38;5;93m'
+BEIGE='\033[38;5;228m'
 NC='\033[0m'
 
 
@@ -34,6 +35,11 @@ function show_purple() {
 function show_violet() {
     echo -e "${VIOLET}$1${NC}"
 }
+
+function show_beige() {
+    echo -e "${BEIGE}$1${NC}"
+}
+
 
 # Логотип команды
 show_logotip() {
@@ -73,10 +79,10 @@ confirm() {
 # Название узла
 show_name() {
    echo ""
-   show_violet '░░░░░▀█▀░█▄░░█░█░▄▀░░░█▀▀█░█░░█░█▀▀█░▀█▀░█▄░░█░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░'
-   show_violet '░░░░░░█░░█░█░█░█▀▄░░░░█░░░░█▀▀█░█▄▄█░░█░░█░█░█░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░'
-   show_violet '░░░░░▄█▄░█░░▀█░█░░█░░░█▄▄█░█░░█░█░░█░▄█▄░█░░▀█░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   show_beige '░░░░░█▀▀█░█▀▀█░▀█▀░█▀▀█░█▄░░█░█▀▀▀░▀█▀░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░'
+   show_beige '░░░░░█░▄▄░█▀▀█░░█░░█▀▀█░█░█░█░█▀▀▀░░█░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░'
+   show_beige '░░░░░█▄▄█░█░░█░▄█▄░█░░█░█░░▀█░█▄▄▄░░█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -88,11 +94,9 @@ show_menu() {
     echo ''
     actions=(
         "1. Установить ноду Gaianet"
-        "2. Установить скрипт "Автообщения""
-        "3. Показать данные для регистрации в проекте"
+        "2. Показать данные для регистрации в проекте"
+        "3. Установить скрипт "Автообщения""
         "4. Подключиться к screen-сессии"
-        "5. "
-        "6. "
         "9. Удаление ноды"
         "0. Выход"
     )
@@ -116,7 +120,7 @@ install_dependencies() {
 
 # Установка скрипта requests
 install_requests() {
-    #cd ~/gaianet || { show_war "Ошибка: директория ~/gaianet не найдена."; return 1; }
+    cd ~/gaianet || { show_war "Ошибка: директория ~/gaianet не найдена."; return 1; }
     wget -O requests.sh https://raw.githubusercontent.com/NodatekaII/Nodes/refs/heads/main/Gaianet/requests.sh
     chmod +x requests.sh
     ./requests.sh --install  
@@ -194,14 +198,11 @@ NODEID=$(jq -r '.address' ~/gaianet/config.json)
 menu() {
     case $1 in
         1)  install_dependencies; install_node ;;
-        2)  install_requests ;;
-        3)  
-            echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
+        2)  echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
             gaianet info ;;
-        4) 
-            screen -r gaia_request ;;
-        9)  
-            delete ;;
+        3)  install_requests ;;    
+        4)  screen -r gaia_request ;;
+        9)  delete ;;
         0)  final_message; exit 0 ;;
         *)  show_war "Неверный выбор, попробуйте снова." ;;
     esac
