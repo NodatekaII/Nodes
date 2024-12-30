@@ -191,13 +191,15 @@ registration_data() {
         show_war "Node ID не найден в config.json."
         return 1
     fi
+    echo ''
     echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
     show_bold "Node ID: "
-    show_blue "$NODEID"
+    show_beige "$NODEID"
     # Извлечение Device ID
     DEVICEID=$(head -n 1 ~/gaianet/deviceid.txt )
     show_bold "Device ID: "
-    show_blue "$DEVICEID"
+    show_beige "$DEVICEID"
+    echo ''
 }
 
 # Удаление ноды
