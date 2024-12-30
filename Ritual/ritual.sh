@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -362,8 +362,14 @@ call_contract() {
     echo "$DEPLOY_OUTPUT"
     echo "========================="
 
+    # Проверка успешности деплоя
+    if echo "$DEPLOY_OUTPUT" | grep -q "Error: Failed to send transaction"; then
+        show_war "❌ Ошибка: Недостаточно средств для развёртывания контракта."
+        return 1
+    fi
+
     # Извлечение адреса контракта
-    CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Deployed SaysHello:\s+)0x[a-fA-F0-9]{40}')
+    CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Deployed SaysHello:\s)0x[a-fA-F0-9]{40}')
     if [[ -z "$CONTRACT_ADDRESS" ]]; then
         show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
         return 1
@@ -397,6 +403,7 @@ call_contract() {
     show_bold "✅ Контракт успешно вызван."
     echo ""
 }
+
 
 # Функция для замены RPC URL
 replace_rpc_url() {
