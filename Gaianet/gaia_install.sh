@@ -90,7 +90,7 @@ show_menu() {
         "1. Установить ноду Gaianet"
         "2. Установить скрипт "Автообщения""
         "3. Показать данные для регистрации в проекте"
-        "4. "
+        "4. Подключиться к screen-сессии"
         "5. "
         "6. "
         "9. Удаление ноды"
@@ -117,7 +117,7 @@ install_dependencies() {
 # Установка скрипта requests
 install_requests() {
     #cd ~/gaianet || { show_war "Ошибка: директория ~/gaianet не найдена."; return 1; }
-    wget https://raw.githubusercontent.com/NodatekaII/Nodes/refs/heads/main/Gaianet/requests.sh
+    wget -O https://raw.githubusercontent.com/NodatekaII/Nodes/refs/heads/main/Gaianet/requests.sh
     chmod +x requests.sh
     ./requests.sh --install  
 }
@@ -198,6 +198,8 @@ menu() {
         3)  
             echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
             gaianet info ;;
+        4) 
+            screen -r gaia_request ;;
         9)  
             delete ;;
         0)  final_message; exit 0 ;;
