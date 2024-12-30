@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -292,14 +292,22 @@ configure_files() {
 
 # Функция для запуска screen сессии
 start_screen_session() {
-        if screen -list | grep -q "ritual"; then
-            show_war "⚠️ Найдена предыдущая сессия 'ritual'. Удаляем..."
-            screen -S ritual -X quit
-            show "Запуск screen сессии 'ritual'..."
-            screen -S ritual -d -m bash -c "project=hello-world make deploy-container; bash"
-            show_bold "✅ Screen сессия ritual успешно запущена."
-            echo ''
-        fi
+    # Проверяем, существует ли сессия 'ritual'
+    if screen -list | grep -q "ritual"; then
+        show_war "⚠️ Найдена предыдущая сессия 'ritual'. Удаляем..."
+        screen -S ritual -X quit
+    fi
+
+    # Запускаем новую сессию 'ritual'
+    show "Запуск screen сессии 'ritual'..."
+    screen -S ritual -d -m bash -c "project=hello-world make deploy-container; bash"
+
+    if screen -list | grep -q "ritual"; then
+        show_bold "✅ Screen сессия ritual успешно запущена."
+    else
+        show_war "❌ Ошибка: Не удалось запустить screen сессию."
+    fi
+    echo ''
 }
 
 # Перезапуск проекта
