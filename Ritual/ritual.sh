@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -358,12 +358,12 @@ call_contract() {
 
     # Развёртываем контракт и извлекаем адрес
     DEPLOY_OUTPUT=$(project=hello-world make deploy-contracts 2>&1 | tee deploy.log)
-    show "===== DEPLOY_OUTPUT ====="
-    show "$DEPLOY_OUTPUT"
-    show "========================="
+    echo "===== DEPLOY_OUTPUT ====="
+    echo "$DEPLOY_OUTPUT"
+    echo "========================="
 
     # Извлечение адреса контракта
-    CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Deployed SaysHello:\s)0x[a-fA-F0-9]{40}')
+    CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Deployed SaysHello:\s+)0x[a-fA-F0-9]{40}')
     if [[ -z "$CONTRACT_ADDRESS" ]]; then
         show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
         return 1
@@ -387,7 +387,7 @@ call_contract() {
         return 1
     fi
 
-    # Вызываем контракт
+    # Вызов контракта
     show "Вызов контракта..."
     if ! project=hello-world make call-contract 2>&1 | tee call_contract.log; then
         show_war "❌ Ошибка при вызове контракта. Смотрите 'call_contract.log' для деталей."
