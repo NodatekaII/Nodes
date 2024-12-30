@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -348,26 +348,22 @@ install_project_dependencies() {
 # Функция для автоматической вставки адреса контракта
 call_contract() {
     show "Развертывание контракта..."
-    cd /root/infernet-container-starter || exit
+    cd /root/infernet-container-starter || { show_war "❌ Каталог проекта не найден."; return 1; }
 
     # Развёртываем контракт и извлекаем адрес
     DEPLOY_OUTPUT=$(project=hello-world make deploy-contracts 2>&1 | tee deploy.log)
-    echo "DEPLOY_OUTPUT содержимое:"
-    echo "$DEPLOY_OUTPUT"
+    show "===== DEPLOY_OUTPUT ====="
+    show "$DEPLOY_OUTPUT"
+    show "========================="
 
     # Извлечение адреса контракта
-    #CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Contract Address: )0x[a-fA-F0-9]{40}')
     CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP '(?<=Deployed SaysHello:\s)0x[a-fA-F0-9]{40}')
-
-
     if [[ -z "$CONTRACT_ADDRESS" ]]; then
-        echo "❌ Ошибка: Не удалось извлечь адрес контракта."
+        show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
+        return 1
     else
-        echo "✅ Адрес контракта: $CONTRACT_ADDRESS"
+        show "✅ Адрес контракта: $CONTRACT_ADDRESS"
     fi
-
-
-    
 
     # Файл для замены
     local contract_file="/root/infernet-container-starter/projects/hello-world/contracts/script/CallContract.s.sol"
@@ -378,9 +374,8 @@ call_contract() {
 
     # Заменяем адрес контракта в файле
     show "Запись адреса контракта в файл $contract_file..."
-    if sed -i "s|SaysGM(.*)|SaysGM($CONTRACT_ADDRESS)|" "$contract_file"; then
+    if sed -i "s|SaysGM(.*)|SaysGM($CONTRACT_ADDRESS);|" "$contract_file"; then
         show_bold "✅ Адрес контракта успешно записан."
-        echo ''
     else
         show_war "❌ Ошибка при записи адреса контракта."
         return 1
@@ -388,14 +383,15 @@ call_contract() {
 
     # Вызываем контракт
     show "Вызов контракта..."
-    if project=hello-world make call-contract; then
-        show_bold "✅ Контракт успешно вызван."
-        echo ""
-    else
-        show_war "❌ Ошибка при вызове контракта."
+    if ! project=hello-world make call-contract 2>&1 | tee call_contract.log; then
+        show_war "❌ Ошибка при вызове контракта. Смотрите 'call_contract.log' для деталей."
         return 1
     fi
+
+    show_bold "✅ Контракт успешно вызван."
+    echo ""
 }
+
 # Функция для замены RPC URL
 replace_rpc_url() {
     if confirm "Заменить RPC URL?"; then
