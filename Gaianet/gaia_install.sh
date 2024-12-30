@@ -153,6 +153,7 @@ install_node() {
         if [[ -z "$NODEID_USER" ]]; then
             echo ''
         else
+            show "Замена Node ID..."
             sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~gaianet/config.json
             sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~gaianet/nodeid.json    
         fi
