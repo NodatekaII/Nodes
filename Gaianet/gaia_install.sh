@@ -113,7 +113,7 @@ fi
 
 # Функция для установки зависимостей
 install_dependencies() {
-    show "Установить необходимые пакеты и зависимости?"
+    show "Установка необходимых пакетов и зависимостей.."
     sudo apt update && sudo apt upgrade -y
     sudo apt-get install jq
 }
