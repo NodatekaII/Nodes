@@ -134,6 +134,40 @@ install_requests() {
     chmod +x requests.sh
     ./requests.sh --install  
 }
+# Функция для проверки, занят ли порт
+is_port_in_use() {
+    local port=$1
+    netstat -tuln | grep -q ":$port"
+}
+
+# Проверка порта
+check_port() {
+    CONFIG_FILE="~/gaianet/config.json"
+    PORT_KEY="llamaedge_port"
+    # Найти текущий порт в файле конфигурации
+    current_port=$(grep -Po '"'"$PORT_KEY"'":\s*"\K[0-9]+' $CONFIG_FILE)
+    if [[ -z "$current_port" ]]; then
+         echo "Не удалось найти ключ '$PORT_KEY' в файле $CONFIG_FILE."
+         exit 1
+    fi
+    echo "Текущий порт: $current_port"
+    # Проверить, используется ли текущий порт
+    if is_port_in_use "$current_port"; then
+        echo "❌ Порт $current_port уже используется."
+        # Найти свободный порт
+        for new_port in $(seq 8000 9000); do
+            if ! is_port_in_use "$new_port"; then
+                echo "✅ Найден свободный порт: $new_port"
+                # Обновить порт в файле конфигурации
+                sed -i "s/\"$PORT_KEY\":\s*\"$current_port\"/\"$PORT_KEY\": \"$new_port\"/" $CONFIG_FILE
+                echo "Порт обновлён на $new_port в $CONFIG_FILE"
+                break
+            fi
+        done
+    else
+        echo "Порт $current_port свободен. Ничего не нужно менять."
+    fi
+}
 
 
 # Функция установки ноды
