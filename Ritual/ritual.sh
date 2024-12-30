@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -380,8 +380,9 @@ call_contract() {
 
     # Заменяем адрес контракта в файле
     show "Запись адреса контракта в файл $contract_file..."
-    if sed -i "s|SaysGM(.*)|SaysGM($CONTRACT_ADDRESS);|" "$contract_file"; then
+    if sed -i "s|SaysGM(.*)|SaysGM($CONTRACT_ADDRESS)|" "$contract_file"; then
         show_bold "✅ Адрес контракта успешно записан."
+        echo ''
     else
         show_war "❌ Ошибка при записи адреса контракта."
         return 1
