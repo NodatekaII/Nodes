@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -494,8 +494,8 @@ menu() {
             # Установка ноды
             install_dependencies
             clone_repository
-            configure_files
             start_screen_session
+            configure_files
             install_foundry
             install_project_dependencies
             call_contract
