@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -232,63 +232,90 @@ clone_repository() {
     fi
 }
 
-# Функция для изменений настроек
-change_settings() {
-    # Получение данных
-    read -p "$(show_bold 'Введите значение sleep [3]: ') " SLEEP
-    SLEEP=${SLEEP:-3}
-    read -p "$(show_bold 'Введите значение trail_head_blocks [1]: ') " TRAIL_HEAD_BLOCKS
-    TRAIL_HEAD_BLOCKS=${TRAIL_HEAD_BLOCKS:-1}
-    read -p "$(show_bold 'Введите значение batch_size [1800]: ') " BATCH_SIZE
-    BATCH_SIZE=${BATCH_SIZE:-1800}
-    read -p "$(show_bold 'Введите значение starting_sub_id [205000]: ') " STARTING_SUB_ID
-    STARTING_SUB_ID=${STARTING_SUB_ID:-205000}
+# Переменные для путей
+CONFIG_PATH="/root/infernet-container-starter/deploy/config.json"
+HELLO_CONFIG_PATH="/root/infernet-container-starter/projects/hello-world/container/config.json"
+DEPLOY_SCRIPT_PATH="/root/infernet-container-starter/projects/hello-world/contracts/script/Deploy.s.sol"
+MAKEFILE_PATH="/root/infernet-container-starter/projects/hello-world/contracts/Makefile"
+DOCKER_COMPOSE_PATH="/root/infernet-container-starter/deploy/docker-compose.yaml"
+PORTS=("4000" "6379" "24224" "8545" "3000")
+DOCKER_IMAGE_VERSION="1.4.0"
+export PATH=$PATH:/root/.foundry/bin
 
-    # Внесение изменений
-    sed -i "s|\"sleep\":.*|\"sleep\": $SLEEP,|" "$HELLO_CONFIG_PATH"
-    sed -i "s|\"batch_size\":.*|\"batch_size\": $BATCH_SIZE,|" "$HELLO_CONFIG_PATH"
-    sed -i "s|\"starting_sub_id\":.*|\"starting_sub_id\": $STARTING_SUB_ID,|" "$HELLO_CONFIG_PATH"
-    sed -i "s|\"trail_head_blocks\":.*|\"trail_head_blocks\": $TRAIL_HEAD_BLOCKS,|" "$HELLO_CONFIG_PATH"
-
+# Функция проверки существования файла
+ensure_file_exists() {
+    local file=$1
+    if [[ ! -f "$file" ]]; then
+        show_war "❌ Файл $file не найден."
+        exit 1
+    fi
 }
 
+# Функция для изменений настроек
+change_settings() {
+    read -p "$(show_bold 'Введите значение sleep [3]: ')" SLEEP
+    SLEEP=${SLEEP:-3}
+    read -p "$(show_bold 'Введите значение trail_head_blocks [1]: ')" TRAIL_HEAD_BLOCKS
+    TRAIL_HEAD_BLOCKS=${TRAIL_HEAD_BLOCKS:-1}
+    read -p "$(show_bold 'Введите значение batch_size [1800]: ')" BATCH_SIZE
+    BATCH_SIZE=${BATCH_SIZE:-1800}
+    read -p "$(show_bold 'Введите значение starting_sub_id [205000]: ')" STARTING_SUB_ID
+    STARTING_SUB_ID=${STARTING_SUB_ID:-205000}
+
+    # Проверка файла
+    ensure_file_exists "$HELLO_CONFIG_PATH"
+
+    # Замена значений с проверкой
+    sed -i "s|\"sleep\":.*|\"sleep\": $SLEEP,|" "$HELLO_CONFIG_PATH" || { show_war "❌ Ошибка при изменении sleep."; return 1; }
+    sed -i "s|\"batch_size\":.*|\"batch_size\": $BATCH_SIZE,|" "$HELLO_CONFIG_PATH" || { show_war "❌ Ошибка при изменении batch_size."; return 1; }
+    sed -i "s|\"starting_sub_id\":.*|\"starting_sub_id\": $STARTING_SUB_ID,|" "$HELLO_CONFIG_PATH" || { show_war "❌ Ошибка при изменении starting_sub_id."; return 1; }
+    sed -i "s|\"trail_head_blocks\":.*|\"trail_head_blocks\": $TRAIL_HEAD_BLOCKS,|" "$HELLO_CONFIG_PATH" || { show_war "❌ Ошибка при изменении trail_head_blocks."; return 1; }
+
+    show "✅ Значения успешно обновлены: sleep=$SLEEP, trail_head_blocks=$TRAIL_HEAD_BLOCKS, batch_size=$BATCH_SIZE, starting_sub_id=$STARTING_SUB_ID"
+}
 
 # Функция для настройки конфигурационных файлов
 configure_files() {
-        show "Настройка файлов конфигурации..."
+    show "Настройка файлов конфигурации..."
 
-        # Резервное копирование файлов
-        cp "$HELLO_CONFIG_PATH" "${HELLO_CONFIG_PATH}.bak"
-        cp "$DEPLOY_SCRIPT_PATH" "${DEPLOY_SCRIPT_PATH}.bak"
-        cp "$MAKEFILE_PATH" "${MAKEFILE_PATH}.bak"
-        cp "$DOCKER_COMPOSE_PATH" "${DOCKER_COMPOSE_PATH}.bak"
+    # Резервное копирование файлов
+    cp "$HELLO_CONFIG_PATH" "${HELLO_CONFIG_PATH}.bak"
+    cp "$DEPLOY_SCRIPT_PATH" "${DEPLOY_SCRIPT_PATH}.bak"
+    cp "$MAKEFILE_PATH" "${MAKEFILE_PATH}.bak"
+    cp "$DOCKER_COMPOSE_PATH" "${DOCKER_COMPOSE_PATH}.bak"
 
-        # Параметры с пользовательским вводом
-        read -p "$(show_bold 'Введите ваш private_key (c 0x): ') " PRIVATE_KEY
-        read -p "$(show_bold 'Введите адрес RPC [https://mainnet.base.org]: ') " RPC_URL
-        RPC_URL=${RPC_URL:-https://mainnet.base.org}
-        change_settings
-        check_and_replace_port 3000 3001 "$HELLO_CONFIG_PATH" "" "\""
-        check_and_replace_port 4000 4001 "$HELLO_CONFIG_PATH" "$DOCKER_COMPOSE_PATH" "4000,"
-        check_and_replace_port 6379 6380 "$HELLO_CONFIG_PATH" "" "\"port\":"
-        check_and_replace_port 8545 8546 "" "$DOCKER_COMPOSE_PATH" ""
-        
-        sed -i "s|\"registry_address\":.*|\"registry_address\": \"0x3B1554f346DFe5c482Bb4BA31b880c1C18412170\",|" "$HELLO_CONFIG_PATH"
-        sed -i "s|\"private_key\":.*|\"private_key\": \"$PRIVATE_KEY\",|" "$HELLO_CONFIG_PATH"
-        sed -i "s|\"rpc_url\":.*|\"rpc_url\": \"$RPC_URL\",|" "$HELLO_CONFIG_PATH"
+    # Параметры с пользовательским вводом
+    read -p "$(show_bold 'Введите ваш private_key (c 0x): ')" PRIVATE_KEY
+    if [[ -z "$PRIVATE_KEY" ]]; then
+        show_war "❌ Private key не может быть пустым."
+        return 1
+    fi
 
-        # Изменения в deploy-скрипте и Makefile
-        sed -i "s|address registry =.*|address registry = 0x3B1554f346DFe5c482Bb4BA31b880c1C18412170;|" "$DEPLOY_SCRIPT_PATH"
-        sed -i "s|sender :=.*|sender := $PRIVATE_KEY|" "$MAKEFILE_PATH"
-        sed -i "s|RPC_URL :=.*|RPC_URL := $RPC_URL|" "$MAKEFILE_PATH"
+    read -p "$(show_bold 'Введите адрес RPC [https://mainnet.base.org]: ')" RPC_URL
+    RPC_URL=${RPC_URL:-https://mainnet.base.org}
 
-        # Изменение порта в docker-compose.yaml
-       
-        sed -i "s|ritualnetwork/infernet-node:1.3.1|ritualnetwork/infernet-node:1.4.0|" "$DOCKER_COMPOSE_PATH"    
+    # Изменение настроек
+    change_settings
 
-        show_bold "✅ Настройка файлов завершена."
-        echo ''
+    # Замена портов
+    check_and_replace_port 3000 3001 "$HELLO_CONFIG_PATH" "" "\""
+    check_and_replace_port 4000 4001 "$HELLO_CONFIG_PATH" "$DOCKER_COMPOSE_PATH" "4000,"
+    check_and_replace_port 6379 6380 "$HELLO_CONFIG_PATH" "" "\"port\":"
+    check_and_replace_port 8545 8546 "" "$DOCKER_COMPOSE_PATH" ""
 
+    # Замена значений в конфигурациях
+    sed -i "s|\"registry_address\":.*|\"registry_address\": \"0x3B1554f346DFe5c482Bb4BA31b880c1C18412170\",|" "$HELLO_CONFIG_PATH"
+    sed -i "s|\"private_key\":.*|\"private_key\": \"$PRIVATE_KEY\",|" "$HELLO_CONFIG_PATH"
+    sed -i "s|\"rpc_url\":.*|\"rpc_url\": \"$RPC_URL\",|" "$HELLO_CONFIG_PATH"
+
+    sed -i "s|address registry =.*|address registry = 0x3B1554f346DFe5c482Bb4BA31b880c1C18412170;|" "$DEPLOY_SCRIPT_PATH"
+    sed -i "s|sender :=.*|sender := $PRIVATE_KEY|" "$MAKEFILE_PATH"
+    sed -i "s|RPC_URL :=.*|RPC_URL := $RPC_URL|" "$MAKEFILE_PATH"
+
+    sed -i "s|ritualnetwork/infernet-node:.*|ritualnetwork/infernet-node:$DOCKER_IMAGE_VERSION|" "$DOCKER_COMPOSE_PATH"
+
+    show_bold "✅ Настройка файлов завершена."
+    echo ''
 }
 
 # Функция для запуска screen сессии
@@ -495,6 +522,7 @@ menu() {
             install_dependencies
             clone_repository
             start_screen_session
+            
             configure_files
             install_foundry
             install_project_dependencies
