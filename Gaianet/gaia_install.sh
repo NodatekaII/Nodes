@@ -90,12 +90,12 @@ show_name() {
 show_menu() {
     show_logotip
     show_name
-    show_bold 'Выберите действие:'
+    show_bold 'Выберите действие: '
     echo ''
     actions=(
         "1. Установить ноду Gaianet"
         "2. Показать данные для регистрации в проекте"
-        "3. Установить скрипт "Автообщения""
+        "3. Установить скрипт "Автообщение""
         "4. Подключиться к screen-сессии"
         "9. Удаление ноды"
         "0. Выход"
@@ -113,7 +113,7 @@ fi
 
 # Функция для установки зависимостей
 install_dependencies() {
-    show "Установка необходимых пакетов и зависимостей.."
+    show "Установка необходимых пакетов и зависимостей..."
     sudo apt update && sudo apt upgrade -y
     sudo apt-get install jq
 }
@@ -136,6 +136,7 @@ install_node() {
         show "Инициализация ноды GaiaNet..."
         if gaianet init; then
             show_bold "Инициализация GaiaNet завершена."
+            echo ''
         else
             show_war "Ошибка при инициализации GaiaNet."
             return 1
@@ -145,6 +146,7 @@ install_node() {
         show "Запуск ноды GaiaNet..."
         if gaianet start; then
             show_bold "Нода GaiaNet успешно запущена."
+            echo ''
         else
             show_war "Ошибка при запуске GaiaNet."
             return 1
@@ -175,7 +177,28 @@ install_node() {
     fi
 }
 
+# Данные для регистрации
+registration_data() {
+   # Проверка наличия config.json
+    if [ ! -f ~/gaianet/config.json ]; then
+        show_war "Файл config.json не найден. Убедись, что нода установлена."
+        return 1
+    fi
 
+    # Извлечение NODEID
+    NODEID=$(jq -r '.address' ~/gaianet/config.json)
+    if [ -z "$NODEID" ]; then
+        show_war "Node ID не найден в config.json."
+        return 1
+    fi
+    echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
+    show_bold "Node ID: "
+    show_blue "$NODEID"
+    # Извлечение Device ID
+    DEVICEID=$(head -n 1 ~/gaianet/deviceid.txt )
+    show_bold "Device ID: "
+    show_blue "$DEVICEID"
+}
 
 # Удаление ноды
 delete() {
@@ -199,14 +222,14 @@ delete() {
     else
         show_war "Отмена. Данные не удалены."
     fi
+    echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
 }
 
 
 menu() {
     case $1 in
         1)  install_dependencies; install_node ;;
-        2)  echo -en "${TERRACOTTA}${BOLD}Перейди по ссылке и активируй ноду: ${NC}${LIGHT_BLUE} http://$NODEID.us.gaianet.network${NC}\n"
-            gaianet info ;;
+        2)  registration_data ;;
         3)  install_requests ;;    
         4)  screen -r gaia_request ;;
         9)  delete ;;
@@ -218,7 +241,7 @@ menu() {
 
 while true; do
     show_menu
-    show_bold 'Ваш выбор:'
+    show_bold 'Ваш выбор: '
     read choice
     menu "$choice"
 done
