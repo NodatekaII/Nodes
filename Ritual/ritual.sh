@@ -204,25 +204,31 @@ check_and_replace_port() {
 # Функция для клонирования репозитория
 clone_repository() {
     local repo_url="https://github.com/ritual-net/infernet-container-starter"
-    local destination="/root/infernet-container-starter"  # Каталог в корневой директории
+    local destination="/root/infernet-container-starter"
 
     # Проверяем, существует ли папка и не является ли она пустой
     if [[ -d "$destination" && -n "$(ls -A "$destination")" ]]; then
         show_war "⚠️ Каталог '$destination' уже существует и не пуст."
         if confirm "Удалить существующий каталог и клонировать заново?"; then
-            show "Удаление существующего каталога и клонирование..."
-            sudo rm -rf "$destination"
-            git clone "$repo_url" "$destination"
+            show "Удаление существующего каталога..."
+            rm -rf "$destination" || { show_war "❌ Не удалось удалить каталог $destination."; return 1; }
         else
             show_war "⚠️ Клонирование пропущено."
+            return 1
         fi
-    else
-        show "Клонирование репозитория infernet-container-starter..."
-        git clone "$repo_url" "$destination"
     fi
 
+    # Клонирование репозитория
+    show "Клонирование репозитория infernet-container-starter..."
+    git clone "$repo_url" "$destination" || { show_war "❌ Ошибка: Не удалось клонировать репозиторий."; return 1; }
+
     # Переход в каталог
-    cd "$destination" || { show_war "❌ Ошибка: Не удалось перейти в каталог $destination"; exit 1; }
+    if cd "$destination"; then
+        show "✅ Успешно перешли в каталог $destination."
+    else
+        show_war "❌ Ошибка: Не удалось перейти в каталог $destination."
+        return 1
+    fi
 }
 
 # Функция для изменений настроек
