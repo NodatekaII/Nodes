@@ -53,7 +53,7 @@ final_message() {
 # Функция для подтверждения действия
 confirm() {
     local prompt="$1"
-    echo -en "$prompt [y/n, Enter = yes]: "  # Выводим вопрос с цветом
+    show_bold "❓ $prompt [y/n, Enter = yes]: "
     read choice  # Читаем ввод пользователя
     case "$choice" in
         ""|y|Y|yes|Yes)  # Пустой ввод или "да"
@@ -103,7 +103,7 @@ show_menu() {
 
 # Проверка на запуск от имени root
 if [ "$EUID" -ne 0 ]; then
-  show_war "Пожалуйста, запустите скрипт с правами root."
+  show_war "⚠️ Пожалуйста, запустите скрипт с правами root."
   exit 1
 fi
 
@@ -114,28 +114,25 @@ ink_dir="$HOME/ink/node"
 
 IP=$(curl -4 -s ifconfig.me)
 if [ -z "$IP" ]; then
-  show_war "Не удалось получить внешний IP адрес."
+  show_war "❌ Не удалось получить внешний IP адрес."
   exit 1
 fi
 
 # Функция для установки зависимостей
 install_dependencies() {
-    show_bold 'Установить необходимые пакеты и зависимости?'
-    if confirm ''; then
-        bash <(curl -s https://raw.githubusercontent.com/NodatekaII/Basic/refs/heads/main/docker.sh)
-        sudo apt install jq net-tools
-    else
-        show_war 'Отменено.'
-    fi
+    show "Установка необходимых пакетов и зависимостей..."
+    sudo apt update && sudo apt upgrade -y
+    bash <(curl -s https://raw.githubusercontent.com/NodatekaII/Basic/refs/heads/main/docker.sh)
+    sudo apt install jq net-tools
 }
 #Клонируем ррепозиторий
 clone_rep() {
     show 'Клонирование репозитория Ink node..'
     if [ -d "$ink_dir" ]; then
-        show "Репозиторий уже скачан. Пропуск клонирования."
+        show "⚠️ Репозиторий уже скачан. Пропуск клонирования."
     else
         git clone https://github.com/inkonchain/node.git "$ink_dir" || {
-            show_war 'Ошибка: не удалось клонировать репозиторий.'
+            show_war '❌ Ошибка: не удалось клонировать репозиторий.'
             exit 0
         }
     fi
@@ -201,7 +198,7 @@ install_node() {
 
     show "Переход в директорию узла..."
     cd "$ink_dir" || {
-        show_war "Ошибка: директория не найдена!"
+        show_war "❌ Ошибка: директория не найдена!"
     }
    
    create_env_file
@@ -211,15 +208,15 @@ install_node() {
     docker compose up -d || {
         show "Перезапуск Docker Compose..."
         docker compose down && docker compose up -d || {
-            show_war "Ошибка при повторном запуске Docker Compose!"
+            show_war "❌ Ошибка при повторном запуске Docker Compose!"
             exit 1
         }
     }
-    show_bold "Установка и запуск выполнены успешно!"
-    echo ""  # Пустая строка для разделения между контейнерами
-    echo -en "${TERRACOTTA}${BOLD}Проверь статус по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+    show_bold "✅ Установка и запуск выполнены успешно!"
+    echo ""  
+    echo -en "${TERRACOTTA}${BOLD}💡 Проверь статус по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
     echo -en "${TERRACOTTA}${BOLD}Login: ${NC}${LIGHT_BLUE}admin  ${NC} ${TERRACOTTA}${BOLD}Password: ${NC}${LIGHT_BLUE}ink${NC}\n"
-    echo ""  # Пустая строка для разделения между контейнерами
+    echo ""  
 }
 
 
@@ -234,14 +231,14 @@ update_mainnet() {
 
     show "Запуск Docker Compose..."
     docker compose up -d --build || {
-        show_war "Ошибка при запуске Docker Compose!"
+        show_war "❌ Ошибка при запуске Docker Compose!"
         exit 1
     }
-    show_bold "Узел успешно обновлён до mainnet!"
-    echo ""  # Пустая строка для разделения между контейнерами
-    echo -en "${TERRACOTTA}${BOLD}Проверь статус ноды по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+    show_bold "✅ Узел успешно обновлён до mainnet!"
+    echo ""  
+    echo -en "${TERRACOTTA}${BOLD}💡 Проверь статус ноды по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
     echo -en "${TERRACOTTA}${BOLD}Login: ${NC}${LIGHT_BLUE}admin  ${NC} ${TERRACOTTA}${BOLD}Password: ${NC}${LIGHT_BLUE}ink${NC}\n"
-    echo ""  # Пустая строка для разделения между контейнерами
+    echo ""  
 }
 
 get_private_key() {
@@ -256,28 +253,28 @@ get_private_key() {
 # Удаление ноды
 delete() {
     if [ -d "$ink_dir" ] && docker ps | grep -q "node-op-geth-1"; then
-        show_war "Нода активна! Остановите её перед удалением."
+        show_war "⚠️ Нода активна! Остановите её перед удалением."
         return 1
     fi
     
-    show "Остановка и удаление контейнеров"
+    show "Остановка и удаление контейнеров..."
     
     # Останавливаем контейнеры и проверяем существование директории
     if [ -d "$ink_dir" ]; then
         cd "$ink_dir" && docker compose down
     else
-        show_war "Директория $ink_dir не найдена. Контейнеры не остановлены."
+        show_war "⚠️ Директория $ink_dir не найдена. Контейнеры не остановлены."
     fi
     # Подтверждение удаления данных
     if confirm "Удалить директорию и все данные?"; then
         if [ -d ~/ink ]; then
             cd ~ && rm -rf ~/ink
-            show_bold "Успешно удалено."
+            show_bold "✅ Успешно удалено."
         else
-            show_war "Директория ~/ink не найдена."
+            show_war "⚠️ Директория ~/ink не найдена."
         fi
     else
-        show_war "Отмена. Не удалено."
+        show_war "⚠️ Отмена. Не удалено."
     fi
 }
 
@@ -286,16 +283,16 @@ menu() {
         1)  install_dependencies; install_node ;;
         2)  update_mainnet ;;
         3)  cd "$ink_dir" && docker compose logs -f --tail 20 ;;
-        4)  [ -d "$ink_dir" ] && cd "$ink_dir" && docker compose ps -a || show_war "Директория $ink_dir не найдена." ;;
+        4)  [ -d "$ink_dir" ] && cd "$ink_dir" && docker compose ps -a || show_war "❌ Директория $ink_dir не найдена." ;;
         5)  get_private_key ;;
         6)  
             echo ""  
-            echo -en "${TERRACOTTA}${BOLD}Проверь статус ноды по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
+            echo -en "${TERRACOTTA}${BOLD}💡 Проверь статус ноды по ссылке: ${NC}${LIGHT_BLUE} http://$IP:3301/${NC}\n"
             echo -en "${TERRACOTTA}${BOLD}Login: ${NC}${LIGHT_BLUE}admin  ${NC} ${TERRACOTTA}${BOLD}Password: ${NC}${LIGHT_BLUE}ink${NC}\n"
             echo "" ;;
         9)  delete ;;
         0)  final_message; exit 0 ;;
-        *)  show_war "Неверный выбор, попробуйте снова." ;;
+        *)  show_war "⚠️ Неверный выбор, попробуйте снова." ;;
     esac
 }
             
