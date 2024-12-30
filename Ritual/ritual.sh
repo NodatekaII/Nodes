@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -140,17 +140,18 @@ install_dependencies() {
     docker pull ritualnetwork/hello-world-infernet:latest
 }
 
-
-# Переменные для путей
-CONFIG_PATH="/root/infernet-container-starter/deploy/config.json"
-HELLO_CONFIG_PATH="/root/infernet-container-starter/projects/hello-world/container/config.json"
-DEPLOY_SCRIPT_PATH="/root/infernet-container-starter/projects/hello-world/contracts/script/Deploy.s.sol"
-MAKEFILE_PATH="/root/infernet-container-starter/projects/hello-world/contracts/Makefile"
-DOCKER_COMPOSE_PATH="/root/infernet-container-starter/deploy/docker-compose.yaml"
-PORTS=("4000" "6379" "24224" "8545" "3000")
-#foundryup="/root/.foundry/bin/foundryup"
-#FORGE_PATH="/root/.foundry/bin/forge"
-export PATH=$PATH:/root/.foundry/bin
+set_var() {
+    # Переменные для путей
+    CONFIG_PATH="/root/infernet-container-starter/deploy/config.json"
+    HELLO_CONFIG_PATH="/root/infernet-container-starter/projects/hello-world/container/config.json"
+    DEPLOY_SCRIPT_PATH="/root/infernet-container-starter/projects/hello-world/contracts/script/Deploy.s.sol"
+    MAKEFILE_PATH="/root/infernet-container-starter/projects/hello-world/contracts/Makefile"
+    DOCKER_COMPOSE_PATH="/root/infernet-container-starter/deploy/docker-compose.yaml"
+    #PORTS=("4000" "6379" "24224" "8545" "3000")
+    #foundryup="/root/.foundry/bin/foundryup"
+    #FORGE_PATH="/root/.foundry/bin/forge"
+    export PATH=$PATH:/root/.foundry/bin
+}
 
 # Проверка, занят ли порт
 is_port_in_use() {
@@ -521,9 +522,9 @@ menu() {
             # Установка ноды
             install_dependencies
             clone_repository
-            start_screen_session
-            
+            set_var
             configure_files
+            start_screen_session
             install_foundry
             install_project_dependencies
             call_contract
