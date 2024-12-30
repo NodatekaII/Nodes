@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -221,7 +221,7 @@ change_ports() {
             free_port=$(find_free_port 4001)
             show "✅ Найден свободный порт: $free_port"
             sed -i "s|4000,|$free_port,|" "$HELLO_CONFIG_PATH"
-            sed -i 's|4000:|$free_port:|' "$DOCKER_COMPOSE_PATH"
+            sed -i "s|4000:|$free_port:|" "$DOCKER_COMPOSE_PATH"
         else
             echo "✅ Порт 4000 свободен."
         fi
@@ -268,7 +268,7 @@ clone_repository() {
 
     # Переход в каталог
     if cd "$destination"; then
-        show "✅ Успешно перешли в каталог $destination."
+        show "Успешно перешли в каталог $destination."
     else
         show_war "❌ Ошибка: Не удалось перейти в каталог $destination."
         return 1
