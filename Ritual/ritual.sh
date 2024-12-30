@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -205,8 +205,45 @@ check_and_replace_port() {
     fi
 }
 
-
-
+change_ports() {
+        # Порт 3000
+        if is_port_in_use 3000; then
+            show "⚠️ Порт 3000 занят. Поиск свободного порта..."
+            free_port=$(find_free_port 3001)
+            show "✅ Найден свободный порт: $free_port"
+            sed -i "s|\"3000\"|\"$free_port\"|" "$HELLO_CONFIG_PATH"
+        else
+            echo "✅ Порт 3000 свободен."
+        fi
+        # Порт 4000
+        if is_port_in_use 4000; then
+            show "⚠️ Порт 4000 занят. Поиск свободного порта..."
+            free_port=$(find_free_port 4001)
+            show "✅ Найден свободный порт: $free_port"
+            sed -i "s|4000,|$free_port,|" "$HELLO_CONFIG_PATH"
+            sed -i 's|4000:|$free_port:|' "$DOCKER_COMPOSE_PATH"
+        else
+            echo "✅ Порт 4000 свободен."
+        fi
+        # Порт 6379
+        if is_port_in_use 6379; then
+            show "⚠️ Порт 6379 занят. Поиск свободного порта..."
+            free_port=$(find_free_port 6380)
+            show "✅ Найден свободный порт: $free_port"
+            sed -i "s|"port": 6379|"port": $free_port|" "$HELLO_CONFIG_PATH"
+        else
+            echo "✅ Порт 6379 свободен."
+        fi
+        # Порт 8545
+        if is_port_in_use 8545; then
+            show "⚠️ Порт 8545 занят. Поиск свободного порта..."
+            free_port=$(find_free_port 8546)
+            show "✅ Найден свободный порт: $free_port"
+            sed -i "s|8545:|$free_port:|" "$DOCKER_COMPOSE_PATH"
+        else
+            echo "✅ Порт 8545 свободен."
+        fi
+}
 
 # Функция для клонирования репозитория
 clone_repository() {
@@ -238,15 +275,7 @@ clone_repository() {
     fi
 }
 
-# Переменные для путей
-CONFIG_PATH="/root/infernet-container-starter/deploy/config.json"
-HELLO_CONFIG_PATH="/root/infernet-container-starter/projects/hello-world/container/config.json"
-DEPLOY_SCRIPT_PATH="/root/infernet-container-starter/projects/hello-world/contracts/script/Deploy.s.sol"
-MAKEFILE_PATH="/root/infernet-container-starter/projects/hello-world/contracts/Makefile"
-DOCKER_COMPOSE_PATH="/root/infernet-container-starter/deploy/docker-compose.yaml"
-PORTS=("4000" "6379" "24224" "8545" "3000")
-DOCKER_IMAGE_VERSION="1.4.0"
-export PATH=$PATH:/root/.foundry/bin
+
 
 # Функция проверки существования файла
 ensure_file_exists() {
@@ -304,10 +333,14 @@ configure_files() {
     change_settings
 
     # Замена портов
-    check_and_replace_port 3000 3001 "$HELLO_CONFIG_PATH" "" "\""
-    check_and_replace_port 4000 4001 "$HELLO_CONFIG_PATH" "$DOCKER_COMPOSE_PATH" "4000,"
-    check_and_replace_port 6379 6380 "$HELLO_CONFIG_PATH" "" "\"port\":"
-    check_and_replace_port 8545 8546 "" "$DOCKER_COMPOSE_PATH" ""
+    #echo "DEBUG: Вызов check_and_replace_port для порта 3000"
+    #check_and_replace_port 3000 3001 "$HELLO_CONFIG_PATH" "" "\""
+    #echo "DEBUG: Вызов check_and_replace_port для порта 3000"
+    #check_and_replace_port 4000 4001 "$HELLO_CONFIG_PATH" "$DOCKER_COMPOSE_PATH" "4000,"
+    #echo "DEBUG: Вызов check_and_replace_port для порта 3000"
+    #check_and_replace_port 6379 6380 "$HELLO_CONFIG_PATH" "" "\"port\":"
+    #echo "DEBUG: Вызов check_and_replace_port для порта 3000"
+    #check_and_replace_port 8545 8546 "" "$DOCKER_COMPOSE_PATH" ""
 
     # Замена значений в конфигурациях
     sed -i "s|\"registry_address\":.*|\"registry_address\": \"0x3B1554f346DFe5c482Bb4BA31b880c1C18412170\",|" "$HELLO_CONFIG_PATH"
@@ -320,6 +353,8 @@ configure_files() {
 
     sed -i "s|ritualnetwork/infernet-node:.*|ritualnetwork/infernet-node:$DOCKER_IMAGE_VERSION|" "$DOCKER_COMPOSE_PATH"
 
+    change_ports
+    
     show_bold "✅ Настройка файлов завершена."
     echo ''
 }
