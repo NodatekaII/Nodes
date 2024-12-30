@@ -94,7 +94,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -311,7 +311,8 @@ change_settings() {
 # Функция для настройки конфигурационных файлов
 configure_files() {
     show "Настройка файлов конфигурации..."
-
+    set_var
+    show "Переменные заданы."
     # Резервное копирование файлов
     cp "$HELLO_CONFIG_PATH" "${HELLO_CONFIG_PATH}.bak"
     cp "$DEPLOY_SCRIPT_PATH" "${DEPLOY_SCRIPT_PATH}.bak"
@@ -561,7 +562,6 @@ menu() {
             # Установка ноды
             install_dependencies
             clone_repository
-            set_var
             configure_files
             start_screen_session
             install_foundry
