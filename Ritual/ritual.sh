@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   #show_blue '     script version: v0.2 MAINNNET'
+   show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -458,6 +458,11 @@ delete_node() {
         cd ~
         show "Остановка и удаление контейнеров..."
         docker compose -f $DOCKER_COMPOSE_PATH down
+        docker rm -rf infernet-node
+        docker rm -rf hello-world
+        docker rm -rf infernet-fluentbit
+        docker rm -rf infernet-anvil
+        docker rm -rf infernet-redis
 
         # Завершение screen сессии
         if screen -list | grep -q "ritual"; then
