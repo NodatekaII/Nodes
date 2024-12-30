@@ -49,7 +49,7 @@ if [ ! -f ~/gaianet/config.json ]; then
 fi
 
 NODEID=$(jq -r '.address' ~/gaianet/config.json)
-URL_CHAT="http://$NODEID.us.gaianet.network/v1/chat/completions"
+URL_CHAT="https://$NODEID.us.gaianet.network/v1/chat/completions"
 
 # Создание виртуального окружения
 VENV_DIR="venv"
