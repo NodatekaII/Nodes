@@ -150,6 +150,19 @@ install_node() {
             return 1
         fi
 
+        # Проверка наличия config.json
+        if [ ! -f ~/gaianet/config.json ]; then
+            show_war "Файл config.json не найден. Убедись, что нода установлена."
+            return 1
+        fi
+
+        # Извлечение NODEID
+        NODEID=$(jq -r '.address' ~/gaianet/config.json)
+        if [ -z "$NODEID" ]; then
+            show_war "Node ID не найден в config.json."
+            return 1
+        fi
+
         # Запуск скрипта автоматического общения
         if confirm "Запустить скрипт автоматического общения с нодой?"; then
             install_requests
@@ -161,6 +174,7 @@ install_node() {
         return 1
     fi
 }
+
 
 
 # Удаление ноды
@@ -187,13 +201,6 @@ delete() {
     fi
 }
 
-
-if [ ! -f ~/gaianet/config.json ]; then
-    show_war "Файл config.json не найден. Убедись, что нода установлена."
-    exit 1
-fi
-
-NODEID=$(jq -r '.address' ~/gaianet/config.json)
 
 menu() {
     case $1 in
