@@ -77,7 +77,6 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 # URL и заголовки для запросов
 url = "$URL_CHAT"
-print(f"Используемый URL: {url}")
 headers = {
     'accept': 'application/json',
     'Content-Type': 'application/json'
