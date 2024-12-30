@@ -138,7 +138,6 @@ install_requests() {
 
 # Функция установки ноды
 install_node() {
-    user_nodeid_request
     show "Установка ноды GaiaNet..."
     if curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash; then
         source /root/.bashrc
@@ -244,7 +243,7 @@ delete() {
 
 menu() {
     case $1 in
-        1)  install_dependencies; install_node ;;
+        1)  user_nodeid_request; install_dependencies; install_node ;;
         2)  registration_data ;;
         3)  install_requests ;;    
         4)  screen -r gaia_request ;;
