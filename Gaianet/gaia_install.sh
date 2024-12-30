@@ -118,6 +118,15 @@ install_dependencies() {
     sudo apt-get install jq
 }
 
+# Запрос для пользовательского Node ID
+user_nodeid_request() {
+    if confirm "Вы переустанавливаете ноду и хотите использовать существующий Node ID?"; then
+        read -p "$(show_bold 'Введите ваш Node ID: ') " NODEID_USER
+    else
+        show "Хорошо. Начинаю установку новой ноды."
+    fi
+}
+
 # Установка скрипта requests
 install_requests() {
     cd ~/gaianet || { show_war "Ошибка: директория ~/gaianet не найдена."; return 1; }
@@ -129,6 +138,7 @@ install_requests() {
 
 # Функция установки ноды
 install_node() {
+    user_nodeid_request
     show "Установка ноды GaiaNet..."
     if curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash; then
         source /root/.bashrc
@@ -141,7 +151,12 @@ install_node() {
             show_war "Ошибка при инициализации GaiaNet."
             return 1
         fi
-
+        if [[ -z "$NODEID_USER" ]]; then
+            echo ''
+        else
+            sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~gaianet/config.json
+            sed -i "s/\"address\": \"[^\"]*\"/\"address\": \"$NODEID_USER\"/" ~gaianet/nodeid.json    
+        fi
         # Запуск GaiaNet
         show "Запуск ноды GaiaNet..."
         if gaianet start; then
