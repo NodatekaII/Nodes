@@ -139,7 +139,7 @@ install_dependencies() {
     docker pull ritualnetwork/hello-world-infernet:latest
 }
 
-set_var() {
+
     
     # Переменные для путей
     CONFIG_PATH="/root/infernet-container-starter/deploy/config.json"
@@ -154,7 +154,6 @@ set_var() {
     export PATH=$PATH:/root/.foundry/bin
     
 
-}
 
 # Проверка, занят ли порт
 is_port_in_use() {
@@ -320,9 +319,7 @@ change_settings() {
 # Функция для настройки конфигурационных файлов
 configure_files() {
     show "Настройка файлов конфигурации..."
-    set_var
-    show "✅ Переменные заданы."
-    echo ""
+
     # Резервное копирование файлов
     cp "$HELLO_CONFIG_PATH" "${HELLO_CONFIG_PATH}.bak"
     cp "$DEPLOY_SCRIPT_PATH" "${DEPLOY_SCRIPT_PATH}.bak"
