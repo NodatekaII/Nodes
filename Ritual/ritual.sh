@@ -93,7 +93,7 @@ show_name() {
    show_gold '░░░░░░░█▀▀█░▀█▀░▀█▀░█░░█░█▀▀█░█░░░░░░░░░█▄░░█░█▀▀█░█▀▀▄░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█▄▄▀░░█░░░█░░█░░█░█▀▀█░█░░░░░░░░░█░█░█░█░░█░█░░█░█▀▀▀░░░░░░░'
    show_gold '░░░░░░░█░░█░▄█▄░░█░░▀▄▄▀░█░░█░█▄▄█░░░░░░█░░▀█░█▄▄█░█▄▄▀░█▄▄▄░░░░░░░'
-   show_blue '     script version: v0.2 MAINNNET'
+   #show_blue '     script version: v0.2 MAINNNET'
    echo ""
 }
 
@@ -172,6 +172,7 @@ find_free_port() {
         fi
     done
     show_war "❌ Не найден свободный порт."
+    echo ""
     exit 1
 }
 
@@ -211,7 +212,8 @@ change_ports() {
             show "✅ Найден свободный порт: $free_port"
             sed -i "s|\"3000\"|\"$free_port\"|" "$HELLO_CONFIG_PATH"
         else
-            echo "✅ Порт 3000 свободен."
+            show "✅ Порт 3000 свободен."
+            echo ""
         fi
         # Порт 4000
         if is_port_in_use 4000; then
@@ -221,7 +223,8 @@ change_ports() {
             sed -i "s|4000,|$free_port,|" "$HELLO_CONFIG_PATH"
             sed -i "s|4000:|$free_port:|" "$DOCKER_COMPOSE_PATH"
         else
-            echo "✅ Порт 4000 свободен."
+            show "✅ Порт 4000 свободен."
+            echo ""
         fi
         # Порт 6379
         if is_port_in_use 6379; then
@@ -230,7 +233,8 @@ change_ports() {
             show "✅ Найден свободный порт: $free_port"
             sed -i "s|"port": 6379|"port": $free_port|" "$HELLO_CONFIG_PATH"
         else
-            echo "✅ Порт 6379 свободен."
+            show "✅ Порт 6379 свободен."
+            echo ""
         fi
         # Порт 8545
         if is_port_in_use 8545; then
@@ -239,7 +243,8 @@ change_ports() {
             show "✅ Найден свободный порт: $free_port"
             sed -i "s|8545:|$free_port:|" "$DOCKER_COMPOSE_PATH"
         else
-            echo "✅ Порт 8545 свободен."
+            show "✅ Порт 8545 свободен."
+            echo ""
         fi
 }
 
@@ -252,10 +257,12 @@ clone_repository() {
     if [[ -d "$destination" && -n "$(ls -A "$destination")" ]]; then
         show_war "⚠️ Каталог '$destination' уже существует и не пуст."
         if confirm "Удалить существующий каталог и клонировать заново?"; then
+            echo ""
             show "Удаление существующего каталога..."
             rm -rf "$destination" || { show_war "❌ Не удалось удалить каталог $destination."; return 1; }
         else
             show_war "⚠️ Клонирование пропущено."
+            echo ""
             return 1
         fi
     fi
@@ -269,6 +276,7 @@ clone_repository() {
         show "Успешно перешли в каталог $destination."
     else
         show_war "❌ Ошибка: Не удалось перейти в каталог $destination."
+        echo ""
         return 1
     fi
 }
@@ -280,6 +288,7 @@ ensure_file_exists() {
     local file=$1
     if [[ ! -f "$file" ]]; then
         show_war "❌ Файл $file не найден."
+        echo ""
         exit 1
     fi
 }
@@ -303,15 +312,17 @@ change_settings() {
     sed -i "s|\"batch_size\":.*|\"batch_size\": $BATCH_SIZE,|" "$HELLO_CONFIG_PATH" || { show_war "❌ Ошибка при изменении batch_size."; return 1; }
     sed -i "s|\"starting_sub_id\":.*|\"starting_sub_id\": $STARTING_SUB_ID,|" "$HELLO_CONFIG_PATH" || { show_war "❌ Ошибка при изменении starting_sub_id."; return 1; }
     sed -i "s|\"trail_head_blocks\":.*|\"trail_head_blocks\": $TRAIL_HEAD_BLOCKS,|" "$HELLO_CONFIG_PATH" || { show_war "❌ Ошибка при изменении trail_head_blocks."; return 1; }
-
+    echo ""
     show "✅ Значения успешно обновлены: sleep=$SLEEP, trail_head_blocks=$TRAIL_HEAD_BLOCKS, batch_size=$BATCH_SIZE, starting_sub_id=$STARTING_SUB_ID"
+    echo ""
 }
 
 # Функция для настройки конфигурационных файлов
 configure_files() {
     show "Настройка файлов конфигурации..."
     set_var
-    show "Переменные заданы."
+    show "✅ Переменные заданы."
+    echo ""
     # Резервное копирование файлов
     cp "$HELLO_CONFIG_PATH" "${HELLO_CONFIG_PATH}.bak"
     cp "$DEPLOY_SCRIPT_PATH" "${DEPLOY_SCRIPT_PATH}.bak"
@@ -353,7 +364,7 @@ configure_files() {
     sed -i "s|ritualnetwork/infernet-node:.*|ritualnetwork/infernet-node:$DOCKER_IMAGE_VERSION|" "$DOCKER_COMPOSE_PATH"
 
     change_ports
-    
+    echo ''
     show_bold "✅ Настройка файлов завершена."
     echo ''
 }
@@ -372,6 +383,7 @@ start_screen_session() {
 
     if screen -list | grep -q "ritual"; then
         show_bold "✅ Screen сессия ritual успешно запущена."
+        echo ''
     else
         show_war "❌ Ошибка: Не удалось запустить screen сессию."
     fi
@@ -390,6 +402,7 @@ run_foundryup() {
     # Проверяем, установлен ли Foundry
     if ! command -v foundryup &> /dev/null; then
         show_war "⚠️ Foundry не установлен. Сначала выполните установку."
+        echo ''
         return 1
     fi
 
@@ -409,6 +422,7 @@ install_foundry() {
     # Проверяем, установлен ли Foundry
     if command -v foundryup &> /dev/null; then
         show "Foundry уже установлен."
+        echo ''
     else
         show "Установка Foundry..."
         curl -L https://foundry.paradigm.xyz | bash
@@ -443,15 +457,19 @@ call_contract() {
         CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | awk '/Deployed SaysHello:/ {print $3}')
         if [[ -z "$CONTRACT_ADDRESS" ]]; then
             show_war "❌ Ошибка: Не удалось извлечь адрес контракта."
+            echo ''
             return 1
         else
+            echo ''
             show "✅ Адрес контракта: $CONTRACT_ADDRESS"
+            echo ''
         fi
 
         # Файл для замены
         local contract_file="/root/infernet-container-starter/projects/hello-world/contracts/script/CallContract.s.sol"
         if [[ ! -f "$contract_file" ]]; then
             show_war "❌ Файл $contract_file не найден."
+            echo ''
             return 1
         fi
 
@@ -462,6 +480,7 @@ call_contract() {
             echo ''
         else
             show_war "❌ Ошибка при записи адреса контракта."
+            echo ''
             return 1
         fi
 
@@ -469,12 +488,14 @@ call_contract() {
         show "Вызов контракта..."
         if ! project=hello-world make call-contract 2>&1 | tee call_contract.log; then
             show_war "❌ Ошибка при вызове контракта. Смотрите 'call_contract.log' для деталей."
+            echo ''
             return 1
         fi
-
+        echo ''
         show_bold "✅ Контракт успешно вызван."
         echo ""
     else
+        echo ''
         show_bold "⚠️ Отмена развертывания контракта."
         echo ''
     fi
@@ -504,12 +525,14 @@ replace_rpc_url() {
                 files_found=true  # Устанавливаем флаг, если файл найден
             else
                 show_war "⚠️ Файл $config_path не найден, пропуск..."
+                echo ''
             fi
         done
 
         # Если не найдено ни одного файла, выводим сообщение
         if ! $files_found; then
             show_war "❌ Не удалось найти ни одного конфигурационного файла для замены RPC URL."
+            echo ''
             return  # Завершаем выполнение функции
         fi
         restart_node
@@ -517,6 +540,7 @@ replace_rpc_url() {
         echo ''
     else
         show "⚠️ Замена RPC URL отменена."
+        echo ''
     fi
 }
 
@@ -540,11 +564,12 @@ delete_node() {
 
         show "Удаление директории проекта..."
         rm -rf ~/infernet-container-starter
-        
+        echo ''
         show_bold "✅ Нода удалена и файлы очищены."
         echo ''
     else
         show "⚠️ Удаление ноды отменено."
+        echo ''
     fi
 }
 
