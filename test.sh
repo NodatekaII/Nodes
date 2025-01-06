@@ -26,7 +26,8 @@ print_networks() {
         ((index++))
     done
     echo
-    # Принудительная отправка данных в терминал
+    # Принудительная отправка данных на вывод
+    tput sgr0
     sleep 0.1
 }
 
@@ -36,7 +37,8 @@ select_from_list() {
     print_networks
 
     while true; do
-        read -p "Введите номер сети: " user_input
+        echo -n "Введите номер сети: "
+        read -r user_input
         echo "DEBUG: user_input='$user_input'" >&2
 
         # Проверка ввода
