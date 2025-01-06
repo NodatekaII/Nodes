@@ -18,6 +18,7 @@ NETWORKS=(
 
 # Функция для вывода списка сетей
 print_networks() {
+    echo "DEBUG: Вызов print_networks" >&2
     echo "Список доступных сетей:"
     local index=1
     for network in "${NETWORKS[@]}"; do
@@ -29,9 +30,11 @@ print_networks() {
 
 # Функция для выбора сети
 select_from_list() {
+    echo "DEBUG: Вызов select_from_list" >&2
     while true; do
         print_networks
         read -p "Введите номер сети: " user_input
+        echo "DEBUG: user_input='$user_input'" >&2
 
         # Проверка ввода
         if [[ "$user_input" =~ ^[0-9]+$ ]] && (( user_input >= 1 && user_input <= ${#NETWORKS[@]} )); then
@@ -45,5 +48,7 @@ select_from_list() {
 
 # Основная логика
 echo "Перед выбором сети:"
+echo "DEBUG: Перед вызовом select_from_list" >&2
 selected_network=$(select_from_list)
+echo "DEBUG: Выбрана сеть: $selected_network" >&2
 echo "Вы выбрали сеть: $selected_network"
