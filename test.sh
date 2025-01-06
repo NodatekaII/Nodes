@@ -1,32 +1,28 @@
 #!/bin/bash
 
-NETWORKS1=(
+# Список сетей
+NETWORKS=(
     abstracttestnet alephzeroevmmainnet alephzeroevmtestnet alfajores ancient8 apechain
     appchain arbitrum arbitrumnova arbitrumsepolia arcadiatestnet2 argochaintestnet
 )
 
-# Функция для отображения списка сетей
+# Функция для вывода списка сетей
 print_networks() {
-    local -n networks_ref=$1
-    echo "DEBUG: Вызов print_networks. Количество сетей: ${#networks_ref[@]}"
     echo "Список доступных сетей:"
-    for i in "${!networks_ref[@]}"; do
-        echo "DEBUG: Сеть $i -> ${networks_ref[i]}"
-        printf "%3d. %s\n" $((i + 1)) "${networks_ref[i]}"
+    for i in "${!NETWORKS[@]}"; do
+        printf "%3d. %s\n" $((i + 1)) "${NETWORKS[i]}"
     done
-    echo "DEBUG: Завершён вывод списка сетей."
 }
 
-# Функция для выбора из списка
+# Функция для выбора сети
 select_from_list() {
-    local -n input_list=$1
-    echo "DEBUG: Вызов select_from_list. Количество сетей: ${#input_list[@]}"
     while true; do
-        print_networks input_list
+        # Выводим список сетей
+        print_networks
         read -p "Введите номер сети: " user_input
-        echo "DEBUG: Введено значение: $user_input"
-        if [[ "$user_input" =~ ^[0-9]+$ ]] && (( user_input >= 1 && user_input <= ${#input_list[@]} )); then
-            echo "${input_list[user_input - 1]}"
+        # Проверяем корректность ввода
+        if [[ "$user_input" =~ ^[0-9]+$ ]] && (( user_input >= 1 && user_input <= ${#NETWORKS[@]} )); then
+            echo "${NETWORKS[user_input - 1]}"
             return
         else
             echo "⚠️ Неверный ввод. Попробуйте ещё раз."
@@ -34,7 +30,7 @@ select_from_list() {
     done
 }
 
-# Основная проверка
-echo "DEBUG: Перед вызовом select_from_list"
-selected_network=$(select_from_list NETWORKS1)
-echo "DEBUG: Выбранная сеть: $selected_network"
+# Основная логика
+echo "Перед выбором сети:"
+selected_network=$(select_from_list)
+echo "Вы выбрали сеть: $selected_network"
