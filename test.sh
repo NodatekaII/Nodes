@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NETWORKS=(
+NETWORKS1=(
     abstracttestnet alephzeroevmmainnet alephzeroevmtestnet alfajores ancient8 apechain
     appchain arbitrum arbitrumnova arbitrumsepolia arcadiatestnet2 argochaintestnet
 )
@@ -8,8 +8,10 @@ NETWORKS=(
 # Функция для отображения списка сетей
 print_networks() {
     local -n networks_ref=$1
+    echo "DEBUG: Вызов print_networks. Количество сетей: ${#networks_ref[@]}"
     echo "Список доступных сетей:"
     for i in "${!networks_ref[@]}"; do
+        echo "DEBUG: Сеть $i -> ${networks_ref[i]}"
         printf "%3d. %s\n" $((i + 1)) "${networks_ref[i]}"
     done
     echo "DEBUG: Завершён вывод списка сетей."
@@ -18,7 +20,7 @@ print_networks() {
 # Функция для выбора из списка
 select_from_list() {
     local -n input_list=$1
-    echo "DEBUG: Вызов select_from_list. Длина списка: ${#input_list[@]}"
+    echo "DEBUG: Вызов select_from_list. Количество сетей: ${#input_list[@]}"
     while true; do
         print_networks input_list
         read -p "Введите номер сети: " user_input
@@ -34,5 +36,5 @@ select_from_list() {
 
 # Основная проверка
 echo "DEBUG: Перед вызовом select_from_list"
-selected_network=$(select_from_list NETWORKS)
+selected_network=$(select_from_list NETWORKS1)
 echo "DEBUG: Выбранная сеть: $selected_network"
