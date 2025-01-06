@@ -22,10 +22,12 @@ print_networks() {
     echo "Список доступных сетей:"
     local index=1
     for network in "${NETWORKS[@]}"; do
-        echo "$index. $network"
+        printf "%2d. %s\n" "$index" "$network"
         ((index++))
     done
     echo
+    # Принудительная отправка данных в терминал
+    sleep 0.1
 }
 
 # Функция для выбора сети
