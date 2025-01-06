@@ -18,6 +18,7 @@ NETWORKS=(
 
 # Функция для вывода списка сетей
 print_networks() {
+    echo "DEBUG: Вызов print_networks"
     echo "Список доступных сетей:"
     local index=1
     for network in "${NETWORKS[@]}"; do
@@ -29,6 +30,7 @@ print_networks() {
 
 # Функция для выбора сети
 select_from_list() {
+    echo "DEBUG: Вызов select_from_list"
     print_networks
 
     while true; do
@@ -47,6 +49,6 @@ select_from_list() {
 }
 
 # Основная логика
-echo "Перед выбором сети:"
+echo "DEBUG: Перед выбором сети"
 selected_network=$(select_from_list)
 echo "Вы выбрали сеть: $selected_network"
