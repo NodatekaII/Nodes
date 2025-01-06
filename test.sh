@@ -33,8 +33,9 @@ print_networks() {
 # Функция для выбора сети
 select_from_list() {
     echo "DEBUG: Вызов select_from_list" >&2
+    print_networks
+
     while true; do
-        print_networks
         read -p "Введите номер сети: " user_input
         echo "DEBUG: user_input='$user_input'" >&2
 
