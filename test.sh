@@ -2,28 +2,41 @@
 
 # Список сетей
 NETWORKS=(
-    abstracttestnet alephzeroevmmainnet alephzeroevmtestnet alfajores ancient8 apechain
-    appchain arbitrum arbitrumnova arbitrumsepolia arcadiatestnet2 argochaintestnet
+    "abstracttestnet"
+    "alephzeroevmmainnet"
+    "alephzeroevmtestnet"
+    "alfajores"
+    "ancient8"
+    "apechain"
+    "appchain"
+    "arbitrum"
+    "arbitrumnova"
+    "arbitrumsepolia"
+    "arcadiatestnet2"
+    "argochaintestnet"
 )
 
 # Функция для вывода списка сетей
 print_networks() {
     echo "Список доступных сетей:"
-    for i in "${!NETWORKS[@]}"; do
-        printf "%3d. %s\n" $((i + 1)) "${NETWORKS[i]}"
+    local index=1
+    for network in "${NETWORKS[@]}"; do
+        echo "$index. $network"
+        ((index++))
     done
+    echo
 }
 
 # Функция для выбора сети
 select_from_list() {
     while true; do
-        # Выводим список сетей
         print_networks
         read -p "Введите номер сети: " user_input
-        # Проверяем корректность ввода
+
+        # Проверка ввода
         if [[ "$user_input" =~ ^[0-9]+$ ]] && (( user_input >= 1 && user_input <= ${#NETWORKS[@]} )); then
             echo "${NETWORKS[user_input - 1]}"
-            return
+            return 0
         else
             echo "⚠️ Неверный ввод. Попробуйте ещё раз."
         fi
